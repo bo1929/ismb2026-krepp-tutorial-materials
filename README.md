@@ -4,7 +4,7 @@ Datasets for the hands-on exercises for **metagenomic distance estimation and ph
 This document describes how the repository is organized and what data are provided.
 It does not discuss the content of the tutorial.
 
-[!NOTE]
+> [!NOTE]
 > This README file is not necessarily helpful for the tutorial, feel free to not read.
 > Following the provided instructions and the interactive tutorial will be sufficient.
 

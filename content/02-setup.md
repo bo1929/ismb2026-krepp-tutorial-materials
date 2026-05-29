@@ -94,8 +94,8 @@ gappa --help
 ## Download and prepare the tutorial data
 
 ```bash
-git clone https://github.com/<repo>/ismb2026-krepp-tutorial.git
-cd ismb2026-krepp-tutorial
+git clone https://github.com/bo1929/ismb2026-krepp-tutorial-materials.git
+cd ismb2026-krepp-tutorial-materials
 bash scripts/setup.sh
 ```
 

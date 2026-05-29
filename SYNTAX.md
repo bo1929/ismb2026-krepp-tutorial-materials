@@ -1,6 +1,6 @@
 # Tutorial Markdown syntax and HTML mapping
 
-[!CAUTION]
+> [!CAUTION]
 > **Participants should ignore this file.**
 > This document is **for maintainers and authors** who edit files under `content/`.
 

@@ -516,6 +516,7 @@ def extract_template_styles(template_text: str) -> str:
 
 
 def rewrite_paths_for_pages(html: str) -> str:
+    """All HTML lives under pages/; assets are at repo-root figures/."""
     html = html.replace('src="figures/', 'src="../figures/')
     html = html.replace("src='figures/", "src='../figures/")
     html = re.sub(r'href="([^"#?]+?)\.md"', r'href="\1.html"', html)
@@ -827,6 +828,7 @@ def main():
             continue
         body = convert_md(md_path)
         body = postprocess(body)
+        body = rewrite_paths_for_pages(body)
         pages_html_parts.append(build_page_html(idx, body))
         print(f"  [{idx}] {title}")
 

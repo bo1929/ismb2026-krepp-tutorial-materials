@@ -20,6 +20,7 @@ The krepp command-line interface offers a subcommand called `krepp index` that b
 We will use the Web of Life index (tiny version <2 GB) which includes a microbial phylogeny (>10,000 leaves).
 !!! note
     You do not need to run the command below if you already followed the steps in the **Setup** section.
+    Note that this index is heavily downsampled and may underperform for complex samples compared to larger indexes.
 ```bash
 wget https://ter-trees.ucsd.edu/data/krepp/index-WoLv1-tiny.tar
 mkdir -p data
@@ -198,8 +199,8 @@ If you only want to test different parameters and options without overwriting th
     krepp index \
         -i input_map.tsv \
         -o toy-index \
-        --num-threads 4
         -t reference_tree.nwk \
+        --num-threads 4
     ```
     An index constructed with a backbone can be used for phylogenetic placement without providing a tree later, and distance estimates are unaffected.
     You can always specify a backbone with the `krepp place` subcommand, using the `-t` (`--nwk-file`) option.
