@@ -1,6 +1,12 @@
-# ISMB 2026 krepp tutorial (repository guide)
+# Data for ISMB 2026 krepp tutorial
 
-Hands-on materials for **metagenomic distance estimation and phylogenetic placement** with [krepp](https://github.com/bo1929/krepp). This document describes how the repository is organized, how the tutorial is sequenced, and what data are provided. It does not summarize the teaching content inside each lesson.
+Datasets for the hands-on exercises for **metagenomic distance estimation and phylogenetic placement** with [krepp](https://github.com/bo1929/krepp).
+This document describes how the repository is organized and what data are provided.
+It does not discuss the content of the tutorial.
+
+[!NOTE]
+> This README file is not necessarily helpful for the tutorial, feel free to not read.
+> Following the provided instructions and the interactive tutorial will be sufficient.
 
 ---
 
@@ -51,7 +57,7 @@ Some reads come from query genomes that are novel, in other words, without a clo
 | What | File(s) in `data/` |
 |------|-----------|
 | Ground truth abundances | `profile.tsv` |
-| Metadata for the query genomes | `query_info.tsv`, `query_taxonomy.tsv` | 
+| Metadata for the query genomes | `query_info.tsv`, `query_taxonomy.tsv` |
 | Query genomes \& simulated reads | `query_genomes/`, `query_mixture.fq.gz` |
 | Metadata for the reference genomes | `reference_info.tsv`, `reference_taxonomy.tsv` |
 | Reference genomes, their IDs, and the reference phylogeny | `input_map.tsv`, `reference_genomes/` |
