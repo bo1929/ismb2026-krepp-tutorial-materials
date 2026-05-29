@@ -1,0 +1,31 @@
+i	label	role	profile_taxid	profile_genus	ref_accession	ref_taxid	ref_organism	ref_class_taxid	ref_class_name	query_accession
+01	Pyrodictium_occultum	kingdom	54248	Hyperthermus	GCF_000007085.1	273068	Pyrodictium occultum DSM 2709	186801	Clostridia	GCF_000015145.1
+02	Thermus_thermophilus	kingdom	186192	Marinithermus	GCF_000006785.2	160490	Thermus thermophilus HB8	91061	Bacilli	GCF_000195335.1
+03	Allochromatium_vinosum	family	80679	Thioflavicoccus	GCF_900119735.1	1122209	Allochromatium vinosum DSM 180	1236	Gammaproteobacteria	GCF_000327045.1
+04	Candidatus_Endolissoclinum_sp	genus	1263979	Candidatus Endolissoclinum	GCA_965228445.1	2760055	Candidatus Endolissoclinum sp.	28211	Alphaproteobacteria	GCF_000319385.1
+05	Psychrobacter_cryohalolentis	genus	1298608	Psychrobacter	GCF_000013905.1	330922	Psychrobacter cryohalolentis	1236	Gammaproteobacteria	GCF_055395025.1
+06	Palaeococcus_ferrophilus	genus	971279	Palaeococcus	GCF_000966265.1	83868	Palaeococcus ferrophilus	183968	Thermococci	GCF_000725425.1
+07	Nitrosococcus_watsonii	genus	133539	Nitrosococcus	GCF_000143085.1	473531	Nitrosococcus watsonii	1236	Gammaproteobacteria	GCF_000024725.1
+08	Spiribacter_roseus	genus	1335757	Spiribacter	GCF_002813635.1	1855875	Spiribacter roseus	1236	Gammaproteobacteria	GCF_000485905.1
+09	Sulfurovum_mangrovi	genus	387093	Sulfurovum	GCF_020911965.1	2893889	Sulfurovum mangrovi	3031852	Epsilonproteobacteria	GCF_000010345.1
+10	Alteromonas_macleodii	species	28108	Alteromonas	GCF_000172635.2	28108	Alteromonas macleodii	1236	Gammaproteobacteria	GCF_050500325.1
+11	Nitrosococcus_oceani	species	1229	Nitrosococcus	GCF_000155655.1	1229	Nitrosococcus oceani	1236	Gammaproteobacteria	GCF_000012805.1
+12	Alteromonas_mediterranea	species	314275	Alteromonas	GCF_000020585.3	314275	Alteromonas mediterranea	1236	Gammaproteobacteria	GCF_001886435.1
+13	Erythrobacter_litoralis	species	39960	Erythrobacter	GCF_000013005.1	39960	Erythrobacter litoralis	28211	Alphaproteobacteria	GCF_001719165.1
+14	Marinomonas_posidonica	species	936476	Marinomonas	GCF_043422505.1	936476	Marinomonas posidonica	1236	Gammaproteobacteria	GCF_000214215.1
+15	Spiribacter_salinus	species	1335746	Spiribacter	GCA_006569195.1	1335746	Spiribacter salinus	1236	Gammaproteobacteria	GCF_000319575.2
+16	Aliivibrio_wodanis	species	80852	Aliivibrio	GCF_000953695.1	80852	Aliivibrio wodanis	1236	Gammaproteobacteria	GCF_052920805.1
+17	Aliivibrio_salmonicida	species	40269	Aliivibrio	GCF_003942025.1	40269	Aliivibrio salmonicida	1236	Gammaproteobacteria	GCF_000196495.1
+18	Vibrio_anguillarum	species	55601	Vibrio	GCF_003390515.1	55601	Vibrio anguillarum	1236	Gammaproteobacteria	GCF_049315005.1
+19	Thalassolituus_oleivorans	species	187493	Thalassolituus	GCF_001932535.1	187493	Thalassolituus oleivorans	1236	Gammaproteobacteria	GCF_000355675.1
+20	Ilumatobacter_coccineus	species	467094	Ilumatobacter	GCA_002748455.1	467094	Ilumatobacter coccineus	84992	Acidimicrobiia	GCF_000348785.1
+21	Ilumatobacter_sp	genus		Ilumatobacter	GCF_965215205.1	1967498	Ilumatobacter sp.	84992	Acidimicrobiia	
+22	Nitrosococcus_wardiae	genus		Nitrosococcus	GCF_004421105.1	1814290	Nitrosococcus wardiae	1236	Gammaproteobacteria	
+23	Alteromonas_stellipolaris	genus		Alteromonas	GCF_001562195.1	233316	Alteromonas stellipolaris	1236	Gammaproteobacteria	
+24	Marinomonas_mediterranea	genus		Marinomonas	GCF_000192865.1	119864	Marinomonas mediterranea	1236	Gammaproteobacteria	
+25	Erythrobacter_aurantius	genus		Erythrobacter	GCF_023823125.1	2909249	Erythrobacter aurantius	28211	Alphaproteobacteria	
+31	Bacillus_subtilis	kingdom			GCF_000009045.1	224308	Bacillus subtilis subsp. subtilis 168	91061	Bacilli	
+32	Staphylococcus_aureus	kingdom			GCF_000013425.1	93061	Staphylococcus aureus subsp. aureus Mu50	91061	Bacilli	
+33	Mycobacterium_tuberculosis	phylum			GCF_000195955.2	83332	Mycobacterium tuberculosis H37Rv	1760	Actinomycetes	
+34	Bacteroides_fragilis	kingdom			GCF_000012825.1	435590	Bacteroides fragilis NCTC 9343	200643	Bacteroidia	
+35	Fusobacterium_nucleatum	kingdom			GCF_000008195.1	243275	Fusobacterium nucleatum subsp. nucleatum ATCC 25586	203692	Spirochaetia	

@@ -1,0 +1,31 @@
+# Paths are relative to this file.
+
+docs_dir: content
+
+site_name: "ISMB 2026 Tutorial: Metagenomic analysis using krepp"
+site_description: "Distance estimation and phylogenetic placement for short metagenomic reads"
+site_author: "Ali Osman Berk Sapci"
+
+# Handbook shell for scripts/build_html.py (<html lang>, <title>, meta, sidebar, footer labels).
+handbook:
+  html_lang: en
+  html_title: "Tutorial for krepp - ISMB 2026"
+  sidebar_kicker: "ISMB 2026 • Tutorials"
+  sidebar_heading: "Tutorial: krepp"
+  sidebar_tagline: "Step-by-step guide for metagenomic analysis of a toy marine sample"
+  footer_prev: "Previous"
+  footer_next: "Next"
+
+# Grouped entries: parent key = sidebar heading; children = same title keys allowed in other groups.
+# Optional: level-with-``level:`` rows, or flat legacy ``section:`` + list mix, still supported.
+nav:
+  - Core Tutorial:
+      - Overview: 01-overview.md
+      - Setup: 02-setup.md
+      - Dataset: 03-dataset.md
+      - Indexing: 04-indexing.md
+      - Distance Estimation: 05-distance-estimation.md
+      - Phylogenetic Placement: 06-phylogenetic-placement.md
+      - Taxonomic Placement: 07-taxonomic-placement.md
+      - Visualization: 08-visualization.md
+      - Conclusions: 09-conclusions.md
