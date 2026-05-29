@@ -789,13 +789,34 @@ tr:hover td { background: rgba(22, 23, 30, 0.035); }
   margin: 0.15rem 0;
 }
 
+/* Nested callouts: pre must fit the box, not the full page column (--pre-max) */
 .admonition pre,
 details.question pre,
 details.more pre,
 details.admonition pre {
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   margin-inline: 0;
   margin-block: 0.55rem;
+}
+
+.admonition pre code,
+details.question pre code,
+details.more pre code,
+details.admonition pre code {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admonition pre code span,
+details.question pre code span,
+details.more pre code span,
+details.admonition pre code span {
+  padding-right: 0.45rem;
 }
 
 .admonition pre:first-child,
