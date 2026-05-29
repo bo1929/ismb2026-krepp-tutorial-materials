@@ -193,7 +193,14 @@ If you only want to test different parameters and options without overwriting th
     ```
 
 ??? more "Advanced: using a guide tree during indexing for better compression"
-    If you have a phylogeny available (in Newick format), run `krepp index` with the `-t` option and the path to the Newick tree.
+    If you have a phylogeny available (in Newick format), run `krepp index` with the `-t` option and the path to the Newick tree (inside `data/`):
+    ```bash
+    krepp index \
+        -i input_map.tsv \
+        -o toy-index \
+        --num-threads 4
+        -t reference_tree.nwk \
+    ```
     An index constructed with a backbone can be used for phylogenetic placement without providing a tree later, and distance estimates are unaffected.
     You can always specify a backbone with the `krepp place` subcommand, using the `-t` (`--nwk-file`) option.
     Note that the tip labels of the phylogeny must match the reference IDs given in `-i /path/to/input.tsv` for `krepp index`.

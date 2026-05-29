@@ -49,6 +49,7 @@ family, kingdom) indicate a more distant best reference.
 | `data/query_genomes/` | Genome assemblies for those query organisms. |
 | `data/query_mixture.fq.gz` | The simulated read mixture used in the tutorial. |
 | `data/input_map.tsv` | The 31 reference genomes used to build the small toy index. |
+| `data/reference_tree.nwk` | Mash distance NJ tree over the references (tip labels match `input_map` IDs). |
 | `data/reference_info.tsv` | Each reference genome; `role` = match rank to best query. |
 | `data/index-WoLv1-tiny/` | The installed WoL-v1 tiny index used as a larger reference context. |
 

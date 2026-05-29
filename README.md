@@ -60,7 +60,7 @@ Some reads come from query genomes that are novel, in other words, without a clo
 | Metadata for the query genomes | `query_info.tsv`, `query_taxonomy.tsv` |
 | Query genomes \& simulated reads | `query_genomes/`, `query_mixture.fq.gz` |
 | Metadata for the reference genomes | `reference_info.tsv`, `reference_taxonomy.tsv` |
-| Reference genomes, their IDs, and the reference phylogeny | `input_map.tsv`, `reference_genomes/` |
+| Reference genomes, their IDs, and the reference phylogeny | `input_map.tsv`, `reference_genomes/`, and `reference_tree.nwk` |
 | WoL-v1 tiny index | `bash scripts/setup.sh` downloads `data/index-WoLv1-tiny/` (~10,000 refs.) |
 
 **Quick start:** `bash scripts/setup.sh` then `bash scripts/build_site.sh` and open `pages/index.html`.
