@@ -1,0 +1,35 @@
+# Large binary/genomic data -- download via setup.sh or from Zenodo
+data/genomes/
+profile_genomes/
+reference_panel/
+data/index/
+data/query.fq
+data/query.truth.tsv
+query_mixture.fq
+
+# Case-level large assets
+cases/B-rare-novel/query.fq
+cases/B-rare-novel/query.truth.tsv
+cases/C-multi-novel/index/
+cases/C-multi-novel/query.fq
+cases/C-multi-novel/query.truth.tsv
+cases/D-strain-level/index/
+cases/D-strain-level/query.fq
+cases/D-strain-level/query.truth.tsv
+
+# Generated build outputs — rebuild with: bash scripts/build_site.sh
+tutorial.html
+site/
+
+# Local scratch copies of krepp outputs (canonical TSVs live in precomputed/)
+captured/
+
+# OS artifacts
+.DS_Store
+**/.DS_Store
+__pycache__/
+*.pyc
+.cache/
+
+# Project-local R packages (Bioconductor / CRAN installed here for tutorials)
+.R/library/
