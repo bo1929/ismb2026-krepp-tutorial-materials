@@ -1,140 +1,64 @@
-# krepp Tutorial
+# ISMB 2026 krepp tutorial (repository guide)
 
-## Setup
-
-### Hardware requirements
-
-Participants should have access to a machine with at least 8 GB of RAM and 8 GB of free disk space.
-You can either run the tutorial on your personal laptop, or use a remote server that you have access to.
-Some commands we will run may benefit from a multi-threaded setup, but this is only optional.
+Hands-on materials for **metagenomic distance estimation and phylogenetic placement** with [krepp](https://github.com/bo1929/krepp). This document describes how the repository is organized, how the tutorial is sequenced, and what data are provided. It does not summarize the teaching content inside each lesson.
 
 ---
 
-### Software requirements
+## Repository layout
 
-We will be using **krepp** version v0.8.2.
+| Path | Role |
+|------|------|
+| `data/` | **Tutorial dataset**: profiles, metadata tables, reference/query FASTAs, simulated reads (see [Data overview](#data-overview)). |
+| `results/` | Scratch directory for command outputs during the workshop (created by `scripts/setup.sh`). |
+| `figures/` | Static images referenced from Markdown (dataset overview plots, indexing logos, etc.). |
+| `scripts/` | Setup, data construction, HTML build, and figure generation. |
+| `content/` | Tutorial source: one Markdown file per lesson (see [Content structure](#content-structure)). |
+| `config.yml` | Site metadata and navigation order for the HTML build. |
+| `pages/` | Generated HTML (not committed): `full.html`, per-lesson pages, `index.html`. |
+| `SYNTAX.md` | Maintainer notes on Markdown dialect and admonitions. |
+| `BUILD.md` | How to build the HTML site. |
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| conda / micromamba | any recent | environment management |
-| **krepp** | 0.8.2 | distance estimation and placement |
-| gappa | 0.9.0 | phylogenetic placement visualization and processing |
-| wget / curl | any recent | downloading datasets |
-
-We recommend using **micromamba**, refer to [this link](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html) for installation.
-
----
-
-### Create an environment and install krepp
-
-Set up an environment and install `krepp` (version 0.8.2) via Bioconda, then verify the installation:
-```bash
-micromamba create -n krepp-tutorial -c conda-forge -c bioconda krepp=0.8.2 -y
-micromamba activate krepp-tutorial
-krepp --help
-```
-??? question "Expected output:"
-	```
-	krepp version: v0.8.2
-	krepp: a tool for k-mer-based search, distance estimation & phylogenetic placement.
-	Usage: krepp [OPTIONS] SUBCOMMAND
-
-	Options:
-	--help
-	--verbose,--no-verbose{false}
-								Increased verbosity and progress report.
-	--seed UINT                 Random seed for the LSH and other parts that require randomness. [0]
-	--num-threads UINT          Number of threads to use in OpenMP-based parallelism. [1]
-
-	Subcommands:
-	index                       Build an index from k-mers of reference genomes.
-	place                       Place queries on a tree with respect to an index.
-	dist                        Estimate distances of queries to genomes in an index.
-	inspect                     Display statistics and information for a given index.
-	sketch                      Create a sketch from k-mers in a single FASTA/FASTQ file.
-	seek                        Seek query sequences in a sketch and estimate distances.
-	```
-
-Install helper tools into the same environment, and verify:
-```bash
-micromamba install -c conda-forge -c bioconda gappa=0.9.0 wget -y
-gappa --help
-```
-??? question "Expected output:"
-	```
-												....      ....
-												'' '||.   .||'
-													||  ||
-													'|.|'
-		...'   ....   ... ...  ... ...   ....        .|'|.
-		|  ||  '' .||   ||'  ||  ||'  || '' .||      .|'  ||
-		|''   .|' ||   ||    |  ||    | .|' ||     .|'|.  ||
-		'....  '|..'|'. ||...'   ||...'  '|..'|.    '||'    ||:.
-		'....'          ||       ||
-					''''     ''''   v0.9.0 (c) 2017-2025
-									by Lucas Czech and Pierre Barbera
-
-	Usage: gappa [OPTIONS] SUBCOMMAND
-
-	Options:
-	--help FLAG                 Print this help message and exit.
-	--version FLAG              Print the gappa version and exit.
-
-	Subcommands:
-	analyze                     Commands for analyzing and comparing placement data, that is, finding differences and patterns.
-	edit                        Commands for editing and manipulating files like jplace, fasta or newick.
-	examine                     Commands for examining, visualizing, and tabulating information in placement data.
-	prepare                     Commands for preparing and preprocessing of phylogenetic and placement data.
-	simulate                    Commands for random generation of phylogenetic and placement data.
-	tools                       Auxiliary commands of gappa.
-
-	gappa - a toolkit for analyzing and visualizing phylogenetic (placement) data
-	```
+Large or generated assets are listed in `.gitignore` (indexes built during the course, `pages/`, local `results/`, etc.).
 
 ---
 
-### Download and prepare the tutorial data
+## Content structure
 
-```bash
-git clone https://github.com/<repo>/ismb2026-krepp-tutorial.git
-cd ismb2026-krepp-tutorial
-bash scripts/setup.sh
-```
+All lessons live under `content/` as numbered Markdown files. Order and sidebar grouping are defined in `config.yml` under `nav` (currently a single block, **Core Tutorial**).
 
-!!! note
-    `setup.sh` will download a small (~2 GB) microbial index.
+| File | Lesson (nav title) | Role in the flow |
+|------|-------------------|------------------|
+| `01-overview.md` | Overview | Concepts and overview of the method. |
+| `02-setup.md` | Setup | Environment, krepp install, downloading the WoL tiny index, expected `data/` layout. |
+| `03-dataset.md` | Dataset | Describes the mock community and points to every `data/` artifact. |
+| `04-indexing.md` | Indexing | WoL index usage and building the small toy index from `input_map.tsv`. |
+| `05-distance-estimation.md` | Distance Estimation | `krepp dist` on the query mixture against an index. |
+| `06-phylogenetic-placement.md` | Phylogenetic Placement | `krepp place` on the same reads and index. |
+| `07-taxonomic-placement.md` | Taxonomic Placement | Taxonomic mapping and placement. |
+| `08-visualization.md` | Visualization | Inspecting and visualizing results. |
+| `09-conclusions.md` | Conclusions | Wrap-up and summary. |
 
----
+Authoring conventions (admonitions, code fences, tables) are documented in `SYNTAX.md`.
 
-### Verify the inputs are ready
+### Building the HTML site
 
-```bash
-ls data/
-```
+See `BUILD.md`.
 
-??? question "Expected output:"
-    ```
-    input_map.tsv
-    profile.tsv
-    profile_species_accessions.tsv
-    query_genomes
-    query_info.tsv
-    query_mixture.fq.gz
-    reference_genomes
-    reference_info.tsv
-    ```
+## Data overview
+**Mock metagenome with known truth:** 20 profile species (marine Bacteria/Archaea), 100k simulated reads (`query_mixture.fq.gz`), 20 query assemblies, 31 reference genomes.
+Some reads come from query genomes that are novel, in other words, without a close representation among the small reference genome set.
 
-| Path | Description |
-|------|-------------|
-| `reference_genomes/` | 31 reference genome assemblies (FASTA, gzip-compressed) |
-| `reference_info.tsv` | Metadata describing reference labels, taxonomic groups and lineages, and accessions |
-| `input_map.tsv` | Two-column TSV mapping reference labels to genome file paths (31 lines) |
-| `query_genomes/` | Genome assemblies for the 20 query organisms (FASTA, gzip-compressed) |
-| `query_info.tsv` | Metadata for query organisms: taxon and accession |
-| `query_mixture.fq.gz` | 100,000 Illumina reads simulated from the query genomes (FASTQ, gzip-compressed) |
-| `profile.tsv` | Taxonomic profile of the mock community across taxa (77 lines) |
+| What | File(s) in `data/` |
+|------|-----------|
+| Ground truth abundances | `profile.tsv` |
+| Metadata for the query genomes | `query_info.tsv`, `query_taxonomy.tsv` | 
+| Query genomes \& simulated reads | `query_genomes/`, `query_mixture.fq.gz` |
+| Metadata for the reference genomes | `reference_info.tsv`, `reference_taxonomy.tsv` |
+| Reference genomes, their IDs, and the reference phylogeny | `input_map.tsv`, `reference_genomes/` |
+| WoL-v1 tiny index | `bash scripts/setup.sh` downloads `data/index-WoLv1-tiny/` (~10,000 refs.) |
 
-## Reference
+**Quick start:** `bash scripts/setup.sh` then `bash scripts/build_site.sh` and open `pages/index.html`.
 
-Sapci & Mirarab, *Genome Biology* 27:108 (2026).
-https://doi.org/10.1186/s13059-026-03999-y
+Install krepp, following `content/02-setup.md`.
+
+Build and/or download indexes following `content/04-indexing.md` (also see [krepp wiki](https://github.com/bo1929/krepp/wiki/Available-reference-indexes)).

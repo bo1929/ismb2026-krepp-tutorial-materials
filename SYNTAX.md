@@ -1,13 +1,15 @@
 # Tutorial Markdown syntax and HTML mapping
 
-**Participants should ignore this file.**
-This document is **for maintainers and authors** who edit files under `content/`.
+[!CAUTION]
+> **Participants should ignore this file.**
+> This document is **for maintainers and authors** who edit files under `content/`.
 
 ---
 
 ## Pipeline
 
-Tutorial pages are Markdown files under `content/` (including `content/cases/`). The handbook `tutorial.html` is built by `scripts/build_html.py`, which:
+Tutorial pages are Markdown files under `content/`.
+The handbook and all the pages are built by `scripts/build_html.py`, which:
 
 1. Reads `config.yml`: `docs_dir`, `nav`.
 Preferred shape is **grouped lists** (each top item is `SectionName:` with indented `- Title: relative/path.md`).
@@ -104,7 +106,7 @@ Lines after `!!!` that belong to the admonition must stay **indented** until the
     Body only. Python-Markdown still emits a title line; for `note` it is typically the word **Note**.
 ```
 
-Example in this repo: `content/04-index.md`.
+Example in this repo: `content/04-indexing.md`.
 
 ### Types used under `content/`
 
@@ -200,12 +202,4 @@ Rough HTML:
 1. Indent admonition and `???` (`question`, `more`, etc.) bodies consistently (four spaces is standard).
 2. Leave a blank line before and after fenced code and callouts where Markdown looks ambiguous.
 3. Sync `config.yml` `nav`: group pages under `SectionName:` blocks; keep `nav_badges` aligned with those headings and link titles.
-
 4. Rebuild locally: `bash scripts/build_site.sh` or `python3 scripts/build_html.py --root .`
-
----
-
-## Regenerating output
-
-Changing this file never updates `tutorial.html` by itself.
-Run the build script above so the handbook picks up Markdown edits under `content/`.

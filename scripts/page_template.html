@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="{{HTML_LANG}}" class="isolated-doc">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="{{META_DESCRIPTION}}">
+<meta name="author" content="{{META_AUTHOR}}">
+<title>{{PAGE_TITLE}} &mdash; {{HTML_TITLE}}</title>
+<style>
+{{PROSE_STYLES}}
+/* Isolated lesson page: undo handbook shell (fixed viewport, no scroll) */
+html.isolated-doc,
+html.isolated-doc body.isolated-page {
+  height: auto !important;
+  min-height: 100%;
+  overflow: visible !important;
+  overflow-x: clip;
+}
+body.isolated-page {
+  display: block !important;
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-app);
+  color: var(--text);
+  font-family: var(--font-sans);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+.isolated-header {
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.isolated-header-inner {
+  max-width: calc(var(--page-text-max) + 3rem);
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.isolated-kicker {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.isolated-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--head-tint);
+  margin: 0.15rem 0 0;
+}
+.isolated-navlinks {
+  font-size: 0.8125rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1rem;
+}
+.isolated-navlinks a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+.isolated-navlinks a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.isolated-article {
+  max-width: calc(var(--page-text-max) + 3rem);
+  margin: 0 auto;
+  padding: 1.75rem 1.5rem 2.5rem;
+}
+.isolated-article-inner {
+  background: var(--bg-main);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-panel);
+  padding: 2rem clamp(1.25rem, 4vw, 2.5rem) 2.25rem;
+}
+.isolated-footer {
+  max-width: calc(var(--page-text-max) + 3rem);
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.isolated-footer .nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 6rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.isolated-footer .nav-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+.isolated-footer .nav-btn.primary {
+  color: var(--btn-primary-fg);
+  background: linear-gradient(180deg, #4f7499, var(--accent));
+  border-color: rgba(54, 99, 145, 0.4);
+}
+.isolated-footer .nav-btn.primary:hover {
+  color: var(--btn-primary-fg-hover);
+  background: linear-gradient(180deg, #446687, var(--accent-hover));
+}
+.isolated-footer .nav-btn.disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+.isolated-counter {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  .isolated-article-inner { padding: 1.35rem 1rem 1.5rem; }
+}
+</style>
+</head>
+<body class="isolated-page">
+
+<header class="isolated-header">
+  <div class="isolated-header-inner">
+    <div>
+      <div class="isolated-kicker">{{SIDEBAR_KICKER}}</div>
+      <p class="isolated-title">{{PAGE_TITLE}}</p>
+    </div>
+    <nav class="isolated-navlinks" aria-label="Tutorial navigation">
+      <a href="index.html">All pages</a>
+      <a href="full.html">Full handbook</a>
+    </nav>
+  </div>
+</header>
+
+<main class="isolated-article">
+  <div class="isolated-article-inner">
+{{BODY}}
+  </div>
+</main>
+
+<footer class="isolated-footer">
+  {{PREV_NAV}}
+  <span class="isolated-counter">{{PAGE_COUNTER}}</span>
+  {{NEXT_NAV}}
+</footer>
+
+<script>
+(function initPreCopyButtons() {
+  const LABEL = 'Copy';
+  function copyPlainText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise((resolve, reject) => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        if (document.execCommand('copy')) resolve();
+        else reject(new Error('execCommand failed'));
+      } catch (e) {
+        reject(e);
+      } finally {
+        document.body.removeChild(ta);
+      }
+    });
+  }
+  document.querySelectorAll('pre > code').forEach(code => {
+    const pre = code.parentElement;
+    if (!pre || pre.querySelector('.pre-copy-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pre-copy-btn';
+    btn.setAttribute('aria-label', 'Copy code to clipboard');
+    btn.textContent = LABEL;
+    btn.addEventListener('click', () => {
+      const txt = code.innerText.replace(/\r\n/g, '\n');
+      copyPlainText(txt).then(
+        () => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = LABEL; }, 2000); },
+        () => { btn.textContent = 'Failed'; setTimeout(() => { btn.textContent = LABEL; }, 2500); }
+      );
+    });
+    pre.appendChild(btn);
+  });
+})();
+</script>
+</body>
+</html>

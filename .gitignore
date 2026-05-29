@@ -18,7 +18,7 @@ cases/D-strain-level/query.fq
 cases/D-strain-level/query.truth.tsv
 
 # Generated build outputs — rebuild with: bash scripts/build_site.sh
-tutorial.html
+pages/
 site/
 
 # Local scratch copies of krepp outputs (canonical TSVs live in precomputed/)
@@ -30,6 +30,3 @@ captured/
 __pycache__/
 *.pyc
 .cache/
-
-# Project-local R packages (Bioconductor / CRAN installed here for tutorials)
-.R/library/

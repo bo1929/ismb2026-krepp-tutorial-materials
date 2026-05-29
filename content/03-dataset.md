@@ -54,7 +54,7 @@ family, kingdom) indicate a more distant best reference.
 
 ---
 
-## What To Look For
+## What to look for
 
 Good results should recover the abundant close matches, keep same-genus reads
 near the right neighborhood, and place the distant fraction on plausible

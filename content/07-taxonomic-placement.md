@@ -9,7 +9,7 @@ genome id (column 1 of `data-new/input_map.tsv`) with a GTDB-style path.
 
 !!! warning "Build `lineages_refs.tsv` for data-new"
     The **`data-new/`** bundle does not ship `lineages_refs.tsv`. Export ranks from
-    GTDB/NCBI for each genome id, one `<TAB>` separated lineage string per row:
+    GTDB/NCBI for each genome id, one tab-separated lineage string per row:
 
     ```
     Alteromonas_macleodii   k__Bacteria; p__...; g__Alteromonas; s__...

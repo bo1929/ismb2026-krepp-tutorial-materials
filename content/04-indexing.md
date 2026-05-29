@@ -19,7 +19,7 @@ The krepp command-line interface offers a subcommand called `krepp index` that b
 
 We will use the Web of Life index (tiny version <2 GB) which includes a microbial phylogeny (>10,000 leaves).
 !!! note
-    You do not need to run below command if you already followed the steps in the **Setup** section.
+    You do not need to run the command below if you already followed the steps in the **Setup** section.
 ```bash
 wget https://ter-trees.ucsd.edu/data/krepp/index-WoLv1-tiny.tar
 mkdir -p data

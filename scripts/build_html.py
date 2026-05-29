@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-build_html.py - merge content/*.md (per config.yml nav) into tutorial.html.
+build_html.py - merge content/*.md (per config.yml nav) into pages/full.html and
+isolated lesson pages under pages/.
+
 Uses python-markdown + pymdown; post-processes fenced <pre>: always emits data-lang
 (empty string when no fence language); table-wrap.
 """
@@ -11,6 +13,7 @@ import json
 import html as html_escape
 import argparse
 from pathlib import Path
+from typing import Optional
 
 import yaml
 import markdown
@@ -19,6 +22,9 @@ from markdown.extensions.toc import TocExtension
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
+
+PAGES_DIR = "pages"
+FULL_HANDBOOK_NAME = "full.html"
 
 EXTENSIONS = [
     "tables",
@@ -445,11 +451,45 @@ def fix_highlight_pre(html):
     return html
 
 
+_PRE_IN_P = re.compile(
+    r"<p>((?:(?!</p>).)*?<pre\b[\s\S]*?</pre>(?:(?!</p>).)*)</p>",
+    re.DOTALL | re.IGNORECASE,
+)
+_PRE_CHUNK = re.compile(r"(<pre\b[^>]*>.*?</pre>)", re.DOTALL | re.IGNORECASE)
+
+
+def unwrap_pre_from_paragraph(html: str) -> str:
+    """Split <p>…<pre>…</pre>…</p> into separate blocks (valid HTML, better layout)."""
+
+    def _repl(m):
+        inner = m.group(1)
+        parts = _PRE_CHUNK.split(inner)
+        if len(parts) == 1:
+            return m.group(0)
+        out = []
+        for part in parts:
+            part = part.strip()
+            if not part:
+                continue
+            if part.lower().startswith("<pre"):
+                out.append(part)
+            else:
+                out.append(f"<p>{part}</p>")
+        return "\n".join(out)
+
+    prev = None
+    while prev != html:
+        prev = html
+        html = _PRE_IN_P.sub(_repl, html)
+    return html
+
+
 def postprocess(html):
     html = fix_highlight_pre(html)
     html = add_data_lang(html)
     html = ensure_pre_data_lang_attr(html)
     html = wrap_code_lines(html)
+    html = unwrap_pre_from_paragraph(html)
     html = wrap_tables(html)
     return html
 
@@ -466,6 +506,222 @@ def build_page_html(idx, body_html):
         f'</div>\n'
         f'</div>'
     )
+
+
+def extract_template_styles(template_text: str) -> str:
+    m = re.search(r"<style>(.*?)</style>", template_text, re.DOTALL | re.IGNORECASE)
+    if not m:
+        return ""
+    return m.group(1).strip()
+
+
+def rewrite_paths_for_pages(html: str) -> str:
+    html = html.replace('src="figures/', 'src="../figures/')
+    html = html.replace("src='figures/", "src='../figures/")
+    html = re.sub(r'href="([^"#?]+?)\.md"', r'href="\1.html"', html)
+    html = re.sub(r"href='([^'#?]+?)\.md'", r"href='\1.html'", html)
+    return html
+
+
+def page_output_name(md_path: Path) -> str:
+    return f"{md_path.stem}.html"
+
+
+def footer_nav_link(href: Optional[str], label: str, primary: bool = False) -> str:
+    if not href:
+        cls = "nav-btn disabled"
+        if primary:
+            cls += " primary"
+        return f'<span class="{cls}">{html_escape.escape(label, quote=False)}</span>'
+    cls = "nav-btn"
+    if primary:
+        cls += " primary"
+    return (
+        f'<a class="{cls}" href="{html_escape.escape(href, quote=True)}">'
+        f"{html_escape.escape(label, quote=False)}</a>"
+    )
+
+
+def handbook_meta(config) -> dict:
+    hb = config.get("handbook")
+    if not isinstance(hb, dict):
+        hb = {}
+
+    def hb_str(key):
+        v = hb.get(key)
+        return "" if v is None else str(v).strip()
+
+    return {
+        "html_lang": hb_str("html_lang") or "en",
+        "html_title": hb_str("html_title") or "Tutorial",
+        "meta_description": str(config.get("site_description") or hb_str("meta_description")),
+        "meta_author": str(config.get("site_author") or hb_str("meta_author")),
+        "sidebar_kicker": hb_str("sidebar_kicker"),
+        "sidebar_heading": hb_str("sidebar_heading"),
+        "sidebar_tagline": hb_str("sidebar_tagline"),
+        "footer_prev": hb_str("footer_prev") or "Previous",
+        "footer_next": hb_str("footer_next") or "Next",
+    }
+
+
+def fill_isolated_page(template: str, meta: dict, page_title: str, page_counter: str,
+                       body_html: str, prev_nav: str, next_nav: str) -> str:
+    repl = {
+        "{{HTML_LANG}}": html_escape.escape(meta["html_lang"], quote=False),
+        "{{HTML_TITLE}}": html_escape.escape(meta["html_title"], quote=False),
+        "{{META_DESCRIPTION}}": html_escape.escape(meta["meta_description"], quote=True),
+        "{{META_AUTHOR}}": html_escape.escape(meta["meta_author"], quote=True),
+        "{{SIDEBAR_KICKER}}": html_escape.escape(meta["sidebar_kicker"], quote=False),
+        "{{PAGE_TITLE}}": html_escape.escape(page_title, quote=False),
+        "{{PAGE_COUNTER}}": html_escape.escape(page_counter, quote=False),
+        "{{BODY}}": body_html,
+        "{{PREV_NAV}}": prev_nav,
+        "{{NEXT_NAV}}": next_nav,
+    }
+    out = template
+    for key, val in repl.items():
+        out = out.replace(key, val)
+    return out
+
+
+def collect_index_sections(flat_nav, page_entries, config):
+    """Group lessons under nav section headings for index.html."""
+    slug_by_path = {p: page_output_name(p) for (_, p, _) in page_entries}
+    path_to_index = {str(p): i for i, (_, p, _) in enumerate(page_entries)}
+
+    sections = []
+    current = {"heading": "", "lessons": []}
+
+    for row in flat_nav:
+        title, path, badge_section, _nav_level = row
+        if path is None:
+            heading = str(title).strip()
+            if heading:
+                if current["lessons"]:
+                    sections.append(current)
+                current = {"heading": heading, "lessons": []}
+            continue
+
+        slug = slug_by_path.get(path)
+        if not slug:
+            continue
+
+        stem = path.stem
+        prefix = stem.split("-")[0] if "-" in stem else stem
+        idx = path_to_index.get(str(path), 0)
+        num = resolve_nav_badge(config, badge_section or "", title, stem, prefix, idx)
+        current["lessons"].append({
+            "title": title,
+            "href": slug,
+            "num": num,
+        })
+
+    if current["lessons"]:
+        sections.append(current)
+
+    if not sections and page_entries:
+        sections.append({
+            "heading": "Lessons",
+            "lessons": [
+                {
+                    "title": t,
+                    "href": page_output_name(p),
+                    "num": str(i + 1),
+                }
+                for i, (t, p, _) in enumerate(page_entries)
+            ],
+        })
+
+    return sections
+
+
+def render_index_sections_html(sections):
+    blocks = []
+    for sec in sections:
+        heading = html_escape.escape(sec["heading"], quote=False)
+        items = []
+        for les in sec["lessons"]:
+            t = html_escape.escape(les["title"], quote=False)
+            h = html_escape.escape(les["href"], quote=True)
+            n = html_escape.escape(str(les["num"]), quote=False)
+            items.append(
+                f'<li><a href="{h}">'
+                f'<span class="index-num">{n}</span>'
+                f'<span class="index-lesson-title">{t}</span>'
+                f"</a></li>"
+            )
+        blocks.append(
+            f'<section class="index-section">'
+            f"<h2>{heading}</h2>"
+            f'<ul class="index-lessons">{"".join(items)}</ul>'
+            f"</section>"
+        )
+    return "\n\n  ".join(blocks)
+
+
+def build_index_page(root, config, page_entries, flat_nav, index_template_text):
+    meta = handbook_meta(config)
+    sections = collect_index_sections(flat_nav, page_entries, config)
+    sections_html = render_index_sections_html(sections)
+
+    repl = {
+        "{{HTML_LANG}}": html_escape.escape(meta["html_lang"], quote=False),
+        "{{HTML_TITLE}}": html_escape.escape(meta["html_title"], quote=False),
+        "{{META_DESCRIPTION}}": html_escape.escape(meta["meta_description"], quote=True),
+        "{{SIDEBAR_KICKER}}": html_escape.escape(meta["sidebar_kicker"], quote=False),
+        "{{SIDEBAR_HEADING}}": html_escape.escape(meta["sidebar_heading"], quote=False),
+        "{{SIDEBAR_TAGLINE}}": html_escape.escape(meta["sidebar_tagline"], quote=False),
+        "{{SECTIONS}}": sections_html,
+        "{{LESSON_COUNT}}": str(len(page_entries)),
+    }
+    html = index_template_text
+    for key, val in repl.items():
+        html = html.replace(key, val)
+
+    out_path = root / PAGES_DIR / "index.html"
+    out_path.write_text(html, encoding="utf-8")
+    print(f"  pages/index.html")
+
+
+def build_isolated_pages(root, config, page_entries, page_template_text, prose_styles):
+    pages_dir = root / PAGES_DIR
+    pages_dir.mkdir(parents=True, exist_ok=True)
+
+    meta = handbook_meta(config)
+    page_template = page_template_text.replace("{{PROSE_STYLES}}", prose_styles)
+    total = len(page_entries)
+    written = 0
+
+    for idx, (title, md_path, _sec) in enumerate(page_entries):
+        if not md_path.exists():
+            print(f"  WARNING: {md_path} not found, skipping standalone page")
+            continue
+
+        body = convert_md(md_path)
+        body = postprocess(body)
+        body = rewrite_paths_for_pages(body)
+
+        prev_href = page_output_name(page_entries[idx - 1][1]) if idx > 0 else None
+        next_href = page_output_name(page_entries[idx + 1][1]) if idx + 1 < total else None
+        prev_label = f"\u2190 {page_entries[idx - 1][0]}" if idx > 0 else meta["footer_prev"]
+        next_label = f"{page_entries[idx + 1][0]} \u2192" if idx + 1 < total else meta["footer_next"]
+
+        html = fill_isolated_page(
+            page_template,
+            meta,
+            title,
+            f"{idx + 1} / {total}",
+            body,
+            footer_nav_link(prev_href, prev_label),
+            footer_nav_link(next_href, next_label, primary=True),
+        )
+
+        out_name = page_output_name(md_path)
+        (pages_dir / out_name).write_text(html, encoding="utf-8")
+        print(f"  pages/{out_name}")
+        written += 1
+
+    return written
 
 
 def fill_handbook_placeholders(template, config):
@@ -533,12 +789,19 @@ def main():
 
     config_path = Path(args.config).resolve() if args.config else root / "config.yml"
     template_path = scripts_dir / "template.html"
-    out_path = root / "tutorial.html"
+    page_template_path = scripts_dir / "page_template.html"
+    index_template_path = scripts_dir / "index_template.html"
+    pages_dir = root / PAGES_DIR
+    out_path = pages_dir / FULL_HANDBOOK_NAME
 
     if not config_path.exists():
         sys.exit(f"config not found: {config_path}")
     if not template_path.exists():
         sys.exit(f"template.html not found at {template_path}")
+    if not page_template_path.exists():
+        sys.exit(f"page_template.html not found at {page_template_path}")
+    if not index_template_path.exists():
+        sys.exit(f"index_template.html not found at {index_template_path}")
 
     cfg_dir = config_path.parent
     with open(config_path) as fh:
@@ -570,8 +833,9 @@ def main():
     # Build nav
     nav_html = build_nav_html(flat_nav, page_indices, config)
 
-    # Fill template
+    # Fill handbook (pages/full.html)
     template = template_path.read_text(encoding="utf-8")
+    prose_styles = extract_template_styles(template)
     template = fill_handbook_placeholders(template, config)
     output = (
         template
@@ -579,9 +843,19 @@ def main():
         .replace("{{PAGES}}", "\n\n    ".join(pages_html_parts))
     )
 
+    pages_dir.mkdir(parents=True, exist_ok=True)
     out_path.write_text(output, encoding="utf-8")
     size_kb = out_path.stat().st_size // 1024
     print(f"\nWrote {out_path}  ({size_kb} KB)")
+
+    print("\nBuilding isolated lesson pages...")
+    page_template_raw = page_template_path.read_text(encoding="utf-8")
+    n_pages = build_isolated_pages(root, config, page_entries, page_template_raw, prose_styles)
+
+    print("\nBuilding index...")
+    index_template_raw = index_template_path.read_text(encoding="utf-8")
+    build_index_page(root, config, page_entries, flat_nav, index_template_raw)
+    print(f"\nWrote {n_pages} isolated pages under {pages_dir}/")
 
 
 if __name__ == "__main__":
