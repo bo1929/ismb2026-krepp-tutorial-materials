@@ -100,7 +100,7 @@ bash scripts/setup.sh
 ```
 
 !!! note
-    `setup.sh` will download a small (~2 GB) microbial index.
+    `setup.sh` will download a small (~1.5 GB) microbial index.
 
 ---
 
@@ -115,19 +115,23 @@ ls data/
     input_map.tsv
     profile.tsv
     profile_species_accessions.tsv
-    query_genomes
+    query_genomes/
     query_info.tsv
     query_mixture.fq.gz
-    reference_genomes
+    reference_genomes/
     reference_info.tsv
+    reference_tree.nwk
+    index-WoLv1-tiny/
     ```
 
 | Path | Description |
 |------|-------------|
-| `reference_genomes/` | 31 reference genome assemblies (FASTA, gzip-compressed) |
+| `index-WoLv1-tiny/` | A lightweight Web of Life index for ~10,000 microbial genomes |
+| `reference_genomes/` | A toy reference set, consisting of 31 reference genome assemblies (FASTA, gzip-compressed) |
 | `reference_info.tsv` | Metadata describing reference labels, taxonomic groups and lineages, and accessions |
+| `reference_tree.nwk` | A simple baseline phylogeny for the toy reference set, built from Mash distances |
 | `input_map.tsv` | Two-column TSV mapping reference labels to genome file paths (31 lines) |
 | `query_genomes/` | Genome assemblies for the 20 query organisms (FASTA, gzip-compressed) |
-| `query_info.tsv` | Metadata for query organisms: taxon and accession |
+| `query_info.tsv` | Metadata (taxon and accession) for 20 query taxa selected with controlled novelty |
 | `query_mixture.fq.gz` | 100,000 Illumina reads simulated from the query genomes (FASTQ, gzip-compressed) |
 | `profile.tsv` | Taxonomic profile of the mock community across taxa (77 lines) |

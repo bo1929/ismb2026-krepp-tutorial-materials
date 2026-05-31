@@ -97,9 +97,21 @@ REFERENCE_BAR_EDGE = "#6e7a86"
 BASE = 10.0
 SMALL = 9.0
 TINY = 8.5
-TITLE_FS = 12.0
-SUPTITLE_FS = 13.5
-LEGEND_FS = 9.0
+TITLE_FS = 11.5
+SUPTITLE_FS = 13.0
+LEGEND_FS = 8.5
+
+# ── layout ───────────────────────────────────────────────────────────────
+FIG_DPI = 180
+PROFILE_FIGSIZE = (8.0, 8.0)
+REF_FIGSIZE = (7.8, 5.0)
+MARGIN_LEFT_PROFILE = 0.38
+MARGIN_LEFT_REF = 0.22
+MARGIN_RIGHT = 0.97
+MARGIN_TOP = 0.905
+MARGIN_BOTTOM = 0.06
+SUPTITLE_Y = 0.985
+SAVE_PAD_INCHES = 0.06
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -272,7 +284,7 @@ def stacked_bar_handles(data, color_map):
     return handles
 
 
-def draw_stacked_bar(ax, data, color_map, bar_height=0.58):
+def draw_stacked_bar(ax, data, color_map, bar_height=0.58, show_xlabels=True):
     x0 = 0.0
     for name, value in data:
         color = color_map.get(name, color_map.get("Other", "#c8c8c8"))
@@ -282,6 +294,47 @@ def draw_stacked_bar(ax, data, color_map, bar_height=0.58):
     ax.set_xlim(0, 100)
     ax.set_yticks([])
     ax.margins(x=0)
+    ax.tick_params(axis="x", labelbottom=show_xlabels, labelsize=SMALL, pad=2)
+
+
+def draw_legend_row(ax, handles, ncol, loc="center left", columnspacing=0.9):
+    ax.axis("off")
+    ax.legend(
+        handles=handles,
+        loc=loc,
+        ncol=ncol,
+        frameon=False,
+        fontsize=LEGEND_FS,
+        handlelength=1.0,
+        handleheight=0.85,
+        columnspacing=columnspacing,
+        handletextpad=0.45,
+        borderaxespad=0.0,
+    )
+
+
+def apply_figure_margins(fig, left, top=MARGIN_TOP, bottom=MARGIN_BOTTOM):
+    fig.subplots_adjust(left=left, right=MARGIN_RIGHT, top=top, bottom=bottom)
+
+
+def figure_suptitle(fig, text, anchor_ax):
+    pos = anchor_ax.get_position()
+    fig.suptitle(
+        text, x=pos.x0, ha="left",
+        fontsize=SUPTITLE_FS, weight="bold", y=SUPTITLE_Y,
+    )
+
+
+def align_axes_width(ax_top, ax_bottom):
+    """Match plot width so stacked bars line up with barh panels below."""
+    pos_bottom = ax_bottom.get_position()
+    pos_top = ax_top.get_position()
+    ax_top.set_position([pos_bottom.x0, pos_top.y0, pos_bottom.width, pos_top.height])
+
+
+def save_figure(fig, path):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(path, dpi=FIG_DPI, bbox_inches="tight", pad_inches=SAVE_PAD_INCHES)
 
 
 def print_query_table(query_rows):
@@ -314,48 +367,35 @@ def print_query_table(query_rows):
 # Figure 1 — Query profile composition
 # ═══════════════════════════════════════════════════════════════════════════
 
-def _summary_panel(fig, gs_cell, data, color_map, title, legend_ncol):
-    """Stacked bar plus a dedicated legend row (no manual text placement)."""
-    inner = gs_cell.subgridspec(2, 1, height_ratios=[1.0, 0.72], hspace=0.12)
-    ax_bar = fig.add_subplot(inner[0, 0])
-    ax_leg = fig.add_subplot(inner[1, 0])
-
-    draw_stacked_bar(ax_bar, data, color_map)
-    ax_bar.set_title(title, loc="left", fontsize=TITLE_FS)
-    ax_bar.tick_params(labelsize=SMALL)
-
-    ax_leg.axis("off")
-    handles = stacked_bar_handles(data, color_map)
-    ax_leg.legend(
-        handles=handles,
-        loc="center left",
-        ncol=legend_ncol,
-        frameon=False,
-        fontsize=LEGEND_FS,
-        handlelength=1.1,
-        handleheight=0.9,
-        columnspacing=1.0,
-        borderaxespad=0.0,
-    )
-    return ax_bar
-
-
 def plot_profile_figure(species, kingdom_data, class_data):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
-    from matplotlib.patches import Patch
 
-    fig = plt.figure(figsize=(8.0, 9.4), dpi=180)
+    fig = plt.figure(figsize=PROFILE_FIGSIZE, dpi=FIG_DPI)
     gs = GridSpec(
-        3, 1, figure=fig,
-        height_ratios=[1.05, 1.45, 5.2],
-        hspace=0.38,
+        5, 1, figure=fig,
+        height_ratios=[0.40, 0.34, 0.46, 0.72, 5.5],
+        hspace=0.28,
     )
 
-    _summary_panel(fig, gs[0], kingdom_data, KINGDOM_COLORS, KINGDOM_TITLE, legend_ncol=2)
-    _summary_panel(fig, gs[1], class_data, CLASS_COLORS, CLASS_TITLE, legend_ncol=4)
+    ax_kingdom = fig.add_subplot(gs[0, 0])
+    draw_stacked_bar(ax_kingdom, kingdom_data, KINGDOM_COLORS, show_xlabels=False)
+    ax_kingdom.set_title(KINGDOM_TITLE, loc="left", fontsize=TITLE_FS, pad=6)
 
-    ax_species = fig.add_subplot(gs[2, 0])
+    ax_kingdom_leg = fig.add_subplot(gs[1, 0])
+    draw_legend_row(ax_kingdom_leg, stacked_bar_handles(kingdom_data, KINGDOM_COLORS), ncol=2)
+
+    ax_class = fig.add_subplot(gs[2, 0])
+    draw_stacked_bar(ax_class, class_data, CLASS_COLORS, show_xlabels=True)
+    ax_class.set_title(CLASS_TITLE, loc="left", fontsize=TITLE_FS, pad=6)
+
+    ax_class_leg = fig.add_subplot(gs[3, 0])
+    draw_legend_row(
+        ax_class_leg, stacked_bar_handles(class_data, CLASS_COLORS),
+        ncol=2, columnspacing=1.4,
+    )
+
+    ax_species = fig.add_subplot(gs[4, 0])
     labels = [row["name"] for row in species]
     values = [row["pct"] for row in species]
     colors = [CLASS_COLORS.get(row["class_name"], CLASS_COLORS["Other"]) for row in species]
@@ -363,35 +403,21 @@ def plot_profile_figure(species, kingdom_data, class_data):
     ax_species.barh(y, values, color=colors, height=0.72, edgecolor="none")
     ax_species.set_yticks(y)
     ax_species.set_yticklabels(labels, fontsize=TINY)
-    ax_species.set_xlim(0, max(values) * 1.20)
-    ax_species.set_xlabel(PERCENT_AXIS_LABEL, fontsize=BASE)
-    ax_species.set_title(SPECIES_TITLE, loc="left", fontsize=TITLE_FS)
-    ax_species.tick_params(labelsize=SMALL)
+    ax_species.set_xlim(0, max(values) * 1.16)
+    ax_species.set_xlabel(PERCENT_AXIS_LABEL, fontsize=BASE, labelpad=4)
+    ax_species.set_title(SPECIES_TITLE, loc="left", fontsize=TITLE_FS, pad=6)
+    ax_species.tick_params(labelsize=SMALL, pad=2)
+    label_offset = max(values) * 0.012
     for yi, value in zip(y, values):
-        ax_species.text(value + 0.2, yi, pct_label_1(value), va="center", fontsize=TINY)
+        ax_species.text(
+            value + label_offset, yi, pct_label_1(value),
+            va="center", ha="left", fontsize=TINY, clip_on=True,
+        )
 
-    classes_used = sorted({row["class_name"] for row in species}, key=str.lower)
-    class_handles = [
-        Patch(facecolor=CLASS_COLORS.get(c, CLASS_COLORS["Other"]), label=c)
-        for c in classes_used
-    ]
-    ax_species.legend(
-        handles=class_handles,
-        title="Class",
-        loc="upper right",
-        ncol=2,
-        frameon=True,
-        framealpha=0.95,
-        edgecolor="#dddddd",
-        fontsize=TINY,
-        title_fontsize=SMALL,
-        handlelength=1.0,
-        handletextpad=0.45,
-        borderpad=0.35,
-    )
-
-    fig.suptitle(PROFILE_TITLE, x=0.02, ha="left", fontsize=SUPTITLE_FS, weight="bold", y=0.985)
-    fig.subplots_adjust(left=0.30, right=0.97, top=0.955, bottom=0.05)
+    apply_figure_margins(fig, MARGIN_LEFT_PROFILE)
+    align_axes_width(ax_kingdom, ax_species)
+    align_axes_width(ax_class, ax_species)
+    figure_suptitle(fig, PROFILE_TITLE, ax_species)
     return fig
 
 
@@ -402,48 +428,36 @@ def plot_profile_figure(species, kingdom_data, class_data):
 def plot_reference_figure(rel_abundance, rel_species, ref_roles):
     import matplotlib.pyplot as plt
     from matplotlib.gridspec import GridSpec
+    from matplotlib.patches import Patch
 
-    fig = plt.figure(figsize=(7.8, 6.6), dpi=180)
+    fig = plt.figure(figsize=REF_FIGSIZE, dpi=FIG_DPI)
     gs = GridSpec(
-        2, 1, figure=fig,
-        height_ratios=[1.15, 1.25],
-        hspace=0.62,
+        3, 1, figure=fig,
+        height_ratios=[0.48, 0.36, 1.08],
+        hspace=0.24,
     )
 
-    # Top: stacked bar + legend in its own row (avoids overlap with bottom panel)
-    gs_top = gs[0].subgridspec(2, 1, height_ratios=[1.0, 0.85], hspace=0.10)
-    ax_rel = fig.add_subplot(gs_top[0, 0])
-    ax_rel_leg = fig.add_subplot(gs_top[1, 0])
-
+    ax_rel = fig.add_subplot(gs[0, 0])
     rel_order = [r for r in RANK_ORDER if rel_abundance.get(r, 0) > 0]
     if not rel_order:
         rel_order = ["other"]
     rel_data = [(r, rel_abundance[r]) for r in rel_order]
-    draw_stacked_bar(ax_rel, rel_data, REL_COLORS, bar_height=0.56)
-    ax_rel.set_xlabel("Percent of query abundance", fontsize=BASE, labelpad=2)
-    ax_rel.set_title(REPRESENTATION_TITLE, loc="left", fontsize=TITLE_FS)
-    ax_rel.tick_params(labelsize=SMALL)
+    draw_stacked_bar(ax_rel, rel_data, REL_COLORS, bar_height=0.56, show_xlabels=True)
+    ax_rel.set_title(REPRESENTATION_TITLE, loc="left", fontsize=TITLE_FS, pad=4)
+    ax_rel.set_xlabel("Percent of query abundance", fontsize=BASE, labelpad=4)
 
-    from matplotlib.patches import Patch
-
+    ax_rel_leg = fig.add_subplot(gs[1, 0])
     rel_handles = [
         Patch(facecolor=REL_COLORS.get(r, REL_COLORS["other"]), edgecolor="white", linewidth=0.8,
               label=legend_label(REL_LABELS.get(r, r), rel_abundance[r]))
         for r in rel_order
     ]
-    ax_rel_leg.axis("off")
-    ax_rel_leg.legend(
-        handles=rel_handles,
-        loc="center left",
+    draw_legend_row(
+        ax_rel_leg, rel_handles,
         ncol=min(4, max(1, len(rel_order))),
-        frameon=False,
-        fontsize=LEGEND_FS,
-        handlelength=1.1,
-        handleheight=0.9,
-        columnspacing=1.2,
     )
 
-    ax_ref = fig.add_subplot(gs[1, 0])
+    ax_ref = fig.add_subplot(gs[2, 0])
     role_order = [r for r in RANK_ORDER if ref_roles.get(r, 0) > 0]
     if not role_order:
         role_order = sorted(ref_roles.keys())
@@ -461,15 +475,16 @@ def plot_reference_figure(rel_abundance, rel_species, ref_roles):
     ax_ref.set_yticks(y)
     ax_ref.set_yticklabels(labels, fontsize=BASE)
     ax_ref.invert_yaxis()
-    ax_ref.set_xlabel(REFERENCE_COUNT_AXIS_LABEL, fontsize=BASE)
-    ax_ref.set_title(REFERENCE_TITLE, loc="left", fontsize=TITLE_FS)
-    ax_ref.tick_params(labelsize=SMALL)
-    ax_ref.set_xlim(0, max(values) + 2.8)
+    ax_ref.set_xlabel(REFERENCE_COUNT_AXIS_LABEL, fontsize=BASE, labelpad=4)
+    ax_ref.set_title(REFERENCE_TITLE, loc="left", fontsize=TITLE_FS, pad=10)
+    ax_ref.tick_params(labelsize=SMALL, pad=2)
+    ax_ref.set_xlim(0, max(values) + 2.4)
     for i, value in enumerate(values):
-        ax_ref.text(value + 0.22, i, str(value), va="center", fontsize=BASE, color="#333333")
+        ax_ref.text(value + 0.18, i, str(value), va="center", ha="left", fontsize=SMALL, color="#333333")
 
-    fig.suptitle(REF_CONTEXT_TITLE, x=0.02, ha="left", fontsize=SUPTITLE_FS, weight="bold", y=0.98)
-    fig.subplots_adjust(left=0.34, right=0.96, top=0.90, bottom=0.08)
+    apply_figure_margins(fig, MARGIN_LEFT_REF)
+    align_axes_width(ax_rel, ax_ref)
+    figure_suptitle(fig, REF_CONTEXT_TITLE, ax_ref)
     return fig
 
 
@@ -506,14 +521,13 @@ def main():
 
     # ── Figure 1: query profile composition ─────────────────────────────
     fig1 = plot_profile_figure(species, kingdom_data, class_data)
-    OUT_PROFILE.parent.mkdir(parents=True, exist_ok=True)
-    fig1.savefig(OUT_PROFILE, bbox_inches="tight")
+    save_figure(fig1, OUT_PROFILE)
     plt.close(fig1)
     print(f"Wrote {OUT_PROFILE}")
 
     # ── Figure 2: reference panel context ───────────────────────────────
     fig2 = plot_reference_figure(rel_abundance, rel_species, ref_roles)
-    fig2.savefig(OUT_REF, bbox_inches="tight")
+    save_figure(fig2, OUT_REF)
     plt.close(fig2)
     print(f"Wrote {OUT_REF}")
 
