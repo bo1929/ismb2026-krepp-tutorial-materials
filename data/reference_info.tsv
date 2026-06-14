@@ -1,4 +1,4 @@
-i	label	role	profile_taxid	profile_genus	ref_accession	ref_taxid	ref_organism	ref_class_taxid	ref_class_name	query_accession
+i	label	novelty_level	profile_taxid	profile_genus	ref_accession	ref_taxid	ref_organism	ref_class_taxid	ref_class_name	query_accession
 01	Pyrodictium_occultum	kingdom	54248	Hyperthermus	GCF_000007085.1	273068	Pyrodictium occultum DSM 2709	186801	Clostridia	GCF_000015145.1
 02	Thermus_thermophilus	kingdom	186192	Marinithermus	GCF_000006785.2	160490	Thermus thermophilus HB8	91061	Bacilli	GCF_000195335.1
 03	Allochromatium_vinosum	family	80679	Thioflavicoccus	GCF_900119735.1	1122209	Allochromatium vinosum DSM 180	1236	Gammaproteobacteria	GCF_000327045.1

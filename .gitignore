@@ -24,6 +24,11 @@ site/
 # Local scratch copies of krepp outputs (canonical TSVs live in precomputed/)
 captured/
 
+# Local scratch and downloaded archives
+tmp/
+index-WoLv1-tiny.tar
+data/index-WoLv1-tiny.tar
+
 # OS artifacts
 .DS_Store
 **/.DS_Store

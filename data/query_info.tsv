@@ -1,4 +1,4 @@
-taxid	taxon	role	accession	organism
+taxid	taxon	novelty_level	accession	organism
 971279	Palaeococcus pacificus	genus	GCF_000725425.1	Palaeococcus pacificus
 28108	Alteromonas macleodii	species	GCF_050500325.1	Alteromonas macleodii
 314275	Alteromonas mediterranea	species	GCF_001886435.1	Alteromonas mediterranea

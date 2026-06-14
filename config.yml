@@ -19,7 +19,7 @@ handbook:
 # Grouped entries: parent key = sidebar heading; children = same title keys allowed in other groups.
 # Optional: level-with-``level:`` rows, or flat legacy ``section:`` + list mix, still supported.
 nav:
-  - Core Tutorial:
+  - Tutorial:
       - Overview: 01-overview.md
       - Setup: 02-setup.md
       - Dataset: 03-dataset.md
