@@ -43,7 +43,7 @@ Edge integers depend on your Newick; treat them as opaque IDs stable within one 
     `DISTAL_NODE = NA` marks mass on an **internal** branch - reads evolve from
     an ancestor **between** named references. That is the hallmark placement when
     the sample contains variation **not** represented on either adjacent leaf
-    (different assembly, species surrogate, or broader novelty).
+    (different assembly, different species, or broader novelty).
 
 Filter reads that were simulated as holdouts:
 
@@ -51,8 +51,8 @@ Filter reads that were simulated as holdouts:
 grep '^novel_' results/place_tab.tsv | head -10
 ```
 
-Compare placement concentration on surrogate terminals vs internal branches for
-rows whose **`role`** in `reference_info.tsv` is coarser than `species` (e.g.
+Compare placement concentration on closest-reference terminals vs internal branches for
+rows whose **`novelty_level`** in `reference_info.tsv` is coarser than `species` (e.g.
 `genus`, `family`, `kingdom`).
 
 ??? question "Q 5.1"
@@ -76,7 +76,7 @@ krepp place -i data-new/ref_index -q data-new/query_mixture.fq.gz \
 Output columns: `DISTAL_NODE`, `EDGE_NUM`, `WEIGHTED_COUNT`, `SEQUENCE_ABUNDANCE`
 
 Internal-branch rows (`DISTAL_NODE = NA`) aggregate uncertainty between references.
-Surrogate references with a coarse shared `role` often deposit measurable mass there even
+Closest references with a coarse shared `novelty_level` often deposit measurable mass there even
 when `--summarize` also peaks on the closest labeled genome.
 
 ??? question "Q 5.3"

@@ -3,8 +3,8 @@
 fetch_genomes.py - download a curated set of marine reference genomes from NCBI.
 
 Inputs (one mode):
-    --species-list  TSV: <short_id>\\t<species_or_strain_name>\\t<role>
-                    role is one of: reference | holdout
+    --species-list  TSV: <short_id>\\t<species_or_strain_name>\\t<genome_kind>
+                    genome_kind is one of: reference | holdout
     --accession-tsv TSV with header: taxid, species, assembly_accession, ...
                     (e.g. profile_species_accessions.tsv). Writes <taxid>.fna.
 
@@ -126,7 +126,7 @@ def main():
                    help="TSV with header containing taxid, species, assembly_accession")
     ap.add_argument("--outdir", required=True)
     ap.add_argument("--manifest", default=None,
-                    help="Output TSV recording id, accession, taxon, role.")
+                    help="Output TSV recording id, accession, taxon, genome_kind.")
     args = ap.parse_args()
 
     outdir = Path(args.outdir)
@@ -155,8 +155,8 @@ def main():
                     continue
                 short_id = tid
                 taxon = spec or tid
-                role = "reference"
-                rows.append((short_id, taxon, role, acc))
+                kind = "reference"
+                rows.append((short_id, taxon, kind, acc))
     else:
         with open(args.species_list) as fh:
             for line in fh:
@@ -166,35 +166,35 @@ def main():
                 parts = line.split("\t")
                 if len(parts) < 3:
                     continue
-                short_id, taxon, role = parts[0], parts[1], parts[2]
-                rows.append((short_id, taxon, role, None))
+                short_id, taxon, kind = parts[0], parts[1], parts[2]
+                rows.append((short_id, taxon, kind, None))
 
     sys.stderr.write(f"Resolving and downloading {len(rows)} genomes...\n")
     success = []
     failed = []
     for row in rows:
-        short_id, taxon, role, fixed_acc = row
+        short_id, taxon, kind, fixed_acc = row
         if fixed_acc:
             sys.stderr.write(f"  {short_id} <- {fixed_acc} ({taxon})\n")
             acc, org_name = fixed_acc, taxon
         else:
-            sys.stderr.write(f"  {short_id} <- {taxon} ({role})\n")
+            sys.stderr.write(f"  {short_id} <- {taxon} ({kind})\n")
             acc, org_name = best_accession(taxon)
         if not acc:
             sys.stderr.write(f"    no accession found for {taxon}\n")
-            failed.append((short_id, taxon, role, "", ""))
+            failed.append((short_id, taxon, kind, "", ""))
             continue
         ok = download_one(acc, short_id, outdir)
         if not shutil.which("datasets"):
             time.sleep(0.35)
         if ok:
-            success.append((short_id, taxon, role, acc, org_name))
+            success.append((short_id, taxon, kind, acc, org_name))
             sys.stderr.write(f"    {acc} ({org_name})\n")
         else:
-            failed.append((short_id, taxon, role, acc, org_name))
+            failed.append((short_id, taxon, kind, acc, org_name))
 
     with open(manifest_path, "w") as fh:
-        fh.write("short_id\ttaxon\trole\taccession\torganism\n")
+        fh.write("short_id\ttaxon\tgenome_kind\taccession\torganism\n")
         for r in success + failed:
             fh.write("\t".join(str(x) for x in r) + "\n")
 

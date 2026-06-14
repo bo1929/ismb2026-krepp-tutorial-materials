@@ -591,6 +591,7 @@ pre {
   border: 1px solid var(--code-ring);
   border-radius: var(--pre-radius);
   padding: var(--pre-pad-y) var(--pre-pad-x);
+  padding-top: calc(var(--pre-bar-h) + var(--pre-pad-y));
   margin-block: var(--pre-margin-block);
   margin-inline: auto;
   max-width: calc(100% - 2 * var(--pre-inset-x));
@@ -600,13 +601,9 @@ pre {
   overflow-x: auto;
 }
 
-/* ── header bar (language tag) ──────────────────────────────── */
-pre[data-lang]:not([data-lang=""]) {
-  padding-top: calc(var(--pre-bar-h) + var(--pre-pad-y));
-}
-
-pre[data-lang]:not([data-lang=""])::before {
-  content: attr(data-lang);
+/* ── header bar (all pre blocks get one for the copy button) ─── */
+pre::before {
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -615,6 +612,13 @@ pre[data-lang]:not([data-lang=""])::before {
   background: var(--code-stripe);
   border-bottom: 1px solid var(--code-ring);
   border-radius: max(0px, calc(var(--pre-radius) - 1px)) max(0px, calc(var(--pre-radius) - 1px)) 0 0;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* Language label text — only when data-lang is non-empty */
+pre[data-lang]:not([data-lang=""])::before {
+  content: attr(data-lang);
   display: flex;
   align-items: center;
   padding: 0 var(--pre-pad-x);
@@ -622,11 +626,8 @@ pre[data-lang]:not([data-lang=""])::before {
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.07em;
-  text-transform: uppercase;
   color: var(--text-dim);
   line-height: 1;
-  box-sizing: border-box;
-  pointer-events: none;
 }
 
 pre code {
@@ -658,10 +659,11 @@ p > pre {
 /* ── copy button ───────────────────────────────────────────── */
 .pre-copy-btn {
   position: absolute;
-  top: 0.18rem;
+  top: var(--pre-bar-btn-gap);
   right: var(--pre-pad-x);
   z-index: 2;
-  padding: 0.06rem 0.32rem;
+  height: calc(var(--pre-bar-h) - 2 * var(--pre-bar-btn-gap));
+  padding: 0 0.32rem;
   border: 1px solid var(--code-ring);
   border-radius: calc(var(--pre-radius) - 1px);
   background: var(--bg-elevated);
@@ -678,14 +680,6 @@ p > pre {
   box-sizing: border-box;
   cursor: pointer;
   box-shadow: none;
-}
-
-/* compact chip, vertically centred in the language banner */
-pre[data-lang]:not([data-lang=""]) > .pre-copy-btn {
-  top: var(--pre-bar-btn-gap);
-  height: calc(var(--pre-bar-h) - 2 * var(--pre-bar-btn-gap));
-  padding-block: 0;
-  transform: none;
 }
 
 .pre-copy-btn:hover {
@@ -821,7 +815,9 @@ tr:hover td { background: rgba(22, 23, 30, 0.035); }
   min-width: 0;
   margin-block: var(--pre-margin-block);
   margin-inline: var(--pre-inset-admonition);
-  padding: var(--pre-pad-y) var(--pre-pad-x);
+  padding-right: var(--pre-pad-x);
+  padding-bottom: var(--pre-pad-y);
+  padding-left: var(--pre-pad-x);
 }
 
 details.question > pre,
@@ -835,7 +831,9 @@ details.more > pre {
   margin-block: var(--pre-margin-block);
   margin-inline-start: calc(var(--callout-details-pad-start) + var(--pre-inset-admonition));
   margin-inline-end: calc(var(--callout-inline) + var(--pre-inset-admonition));
-  padding: var(--pre-pad-y) var(--pre-pad-x);
+  padding-right: var(--pre-pad-x);
+  padding-bottom: var(--pre-pad-y);
+  padding-left: var(--pre-pad-x);
 }
 
 details.question > summary + pre,
@@ -848,11 +846,6 @@ details.question > pre:last-child,
 details.admonition > pre:last-child,
 details.more > pre:last-child {
   margin-bottom: var(--callout-details-pad-bottom);
-}
-
-.admonition pre[data-lang]:not([data-lang=""]),
-details pre[data-lang]:not([data-lang=""]) {
-  padding-top: calc(var(--pre-bar-h) + var(--pre-pad-y));
 }
 
 .admonition pre code,

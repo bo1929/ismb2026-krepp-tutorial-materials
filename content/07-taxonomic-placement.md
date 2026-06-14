@@ -68,7 +68,7 @@ neighboring leaves.
     toward deeper internal edges in the taxonomy-decorated view.
 
 ??? question "Q 6.1"
-    If a profile species were missing entirely from the panel but its **family**
+    If a profile species were missing entirely from the reference set but its **family**
     were represented, where would you expect placement density to accumulate?
 
 ??? question "Q 6.2"

@@ -113,15 +113,17 @@ ls data/
 ??? question "Expected output:"
     ```
     input_map.tsv
+    index-WoLv1-tiny/
     profile.tsv
     profile_species_accessions.tsv
     query_genomes/
     query_info.tsv
+    query_taxonomy.tsv
     query_mixture.fq.gz
     reference_genomes/
     reference_info.tsv
+    reference_taxonomy.tsv
     reference_tree.nwk
-    index-WoLv1-tiny/
     ```
 
 | Path | Description |

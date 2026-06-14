@@ -1,62 +1,104 @@
 # Dataset
+## Query mixture of reads
 
-We use one controlled mock metagenome: **100,000 simulated Illumina reads**
-from **20 query genomes**. The query profile is known, so every later distance,
-placement, and abundance result can be checked against the organisms that truly
-generated the reads.
+- A controlled (mock) metagenomic sample: **100,000 simulated Illumina reads** from **20 query genomes**.
 
-The tutorial uses two reference contexts. First, a **31-genome toy reference
-genome set** lets us inspect the behavior by hand. Second, we install the
-**WoL-v1 tiny index**, a Web of Life reference index with roughly **10,000
-microbial references** and a matching phylogeny, under
-`data/index-WoLv1-tiny/`. The toy set is for interpretation; WoL-v1 is for
-showing the same workflow on a broader database.
+- The mixture is based on an abundance profile mimicking a marine environment.
 
-The toy reference genome set is intentionally uneven. Each query and reference
-genome has a **`role`** in `query_info.tsv` / `reference_info.tsv`: the
-**deepest shared taxonomic rank** (species, genus, family, ...) between that
-genome and its closest partner in the other set. Ranks come from
-`query_taxonomy.tsv` (Kraken-style paths) and NCBI lineages for references;
-recompute with `python3 scripts/update_taxonomy_roles.py`.
+- Queries in this mixture differ in terms of **abundances**, **taxonomies**, and their **novelty level**.
 
-Some queries match a reference at **species** rank (same taxon, different
-assembly). Others share only **genus**, **family**, or **kingdom** with their
-best reference — the distant cases that drive placement on internal branches.
+!!! note
+    We will be comparing our results to the known ground truth profile given in `data/profile.tsv`!
 
-<img src="figures/dataset_profile.png" alt="Query profile composition: kingdom bar, class bar, and per-species abundance chart." style="display: block; margin: 1rem auto; width: 100%; max-width: 760px; height: auto;" />
-
-**Figure 1.** Query profile composition. Top: kingdom- and class-level
-stacked bars showing the overall taxonomic spread. Bottom: all 20 species
-with their relative abundances, coloured by class.
-
-<img src="figures/dataset_reference.png" alt="How query reads relate to the reference panel, and the reference panel composition by role." style="display: block; margin: 1rem auto; width: 100%; max-width: 720px; height: auto;" />
-
-**Figure 2.** Left: query read abundance grouped by each species' **`role`**
-(deepest shared rank with the best-matching reference). Right: the 31-genome
-reference panel counted by the same rank labels. Coarser ranks (e.g. genus,
-family, kingdom) indicate a more distant best reference.
+### Abundances of queries and taxonomic profiles
+- Spanning two kingdoms, Bacteria (83%) and Archaea (17%), and seven classes:
+    * Gammaproteobacteria (~66%)
+    * Thermoprotei (~11%)
+    * Alphaproteobacteria (~8%)
+    * Thermococci (~6%)
+    * Epsilonproteobacteria (~5%)
+    * Acidimicrobiia (~2%)
+    * Deinococci (~2%)
 
 ---
 
-## Files
+### Reference genomes and novelty levels
+To see how a certain taxon can be identified depending on its representation in a reference database, we control its novelty level by measuring the lowest shared taxon of the closest reference genome.
 
-| File or directory | What it contains |
-|-------------------|------------------|
-| `data/profile.tsv` | Ground-truth taxonomic profile and abundances across ranks. |
-| `data/query_taxonomy.tsv` | Taxonomy paths (`|`-separated) for each query taxon. |
-| `data/query_info.tsv` | The 20 query organisms; `role` = match rank to best reference. |
-| `data/reference_taxonomy.tsv` | Cached NCBI taxid paths for reference genomes. |
-| `data/query_genomes/` | Genome assemblies for those query organisms. |
-| `data/query_mixture.fq.gz` | The simulated read mixture used in the tutorial. |
-| `data/input_map.tsv` | The 31 reference genomes used to build the small toy index. |
-| `data/reference_tree.nwk` | Mash distance NJ tree over the references (tip labels match `input_map` IDs). |
-| `data/reference_info.tsv` | Each reference genome; `role` = match rank to best query. |
-| `data/index-WoLv1-tiny/` | The installed WoL-v1 tiny index used as a larger reference context. |
+As it will be discussed in the [next section](04-indexing.md) in more detail, we will be using two different sets of reference genomes:
+
+- a 31-genome toy reference set for controlled novelty,
+- a small but diverse microbial index (Web of Life) spanning many taxa.
+
+For the Web of Life, we do not control the novelty but we do for the toy reference set. Some queries match a reference at **species** rank (same taxon, different individual genomes).
+Others share only **genus**, **family**, or **kingdom** with their best matching reference, in terms of the ANI between them, akin to the phylogenetic distance measured in branch lengths.
+
+!!! tip
+    If a read comes from a genome X of species A under genus B, and if the closest reference Y belongs to the same genus B but not the same species A, then the novelty level would be genus.
+
+**By novelty-level** (the lowest shared taxonomic rank with the closest reference):
+
+- **species**: 11 queries (33% of reads)
+- **genus**: 6 queries (53% of reads)
+- **family**: 1 query (2% of reads)
+- **kingdom**: 2 queries (13% of reads)
+
+<img src="figures/dataset_overview.png" alt="Dataset overview." style="display: block; margin: 1rem auto; width: 100%; max-width: 760px; height: auto;" />
+**Figure 1.** Dataset overview. **Left:** What portion of the query reads relates to the toy reference set by **`novelty`**, then kingdom and class level abundances.
+**Right:** All 20 query species with relative abundances (coloured by class).
+
+!!! note
+    As novelty increases (species to kingdom), it becomes more difficult to identify a read and incorporate it in the analysis.
+
+## Reference genome set
+- References cover two kingdoms (Bacteria and Archaea), five phyla (Proteobacteria, Actinobacteria, Deinococcus-Thermus, Crenarchaeota, and Euryarchaeota), and seven classes (Gammaproteobacteria, Alphaproteobacteria, Epsilonproteobacteria, Acidimicrobiia, Deinococci, Thermoprotei, and Thermococci).
+
+- Below we show a phylogeny consisting of both reference genomes and query genomes.
+- Novelty of each query can also be understood as the branch length to the closest reference in this phylogeny.
+- We will use a similar phylogeny after excluding the queries to perform phylogenetic placement of the reads in the query mixture.
+
+
+<img src="figures/dataset_reference_phylogeny.png" alt="Mash neighbor-joining tree with all 31 reference genomes and all 20 query genomes as tips." style="display: block; margin: 1rem auto; width: 100%; max-width: 900px; height: auto;" />
+**Figure 2.**
+A toy phylogeny built using Mash distances and neighbor-joining.
+Although this may not be the most reliable method for obtaining a microbial phylogeny (as Mash distances do not extend well to highly divergent genomes, which we have in our case), it is good enough for our purposes.
+Note that the same species may appear at tips both as query and reference, which correspond to queries that are least novel (another genome from the exact same species is present in the reference).
 
 ---
 
-## What to look for
+## Goals
 
-Good results should recover the abundant close matches, keep same-genus reads
-near the right neighborhood, and place the distant fraction on plausible
-internal branches instead of treating every read as an exact reference hit.
+* Abundant and low-novelty query reads should be identified correctly with low distances.
+
+* High novelty reads should be mapped correctly to corresponding references but with potentially high distances.
+
+* Rare and low-abundance queries should be detected with correct abundances.
+
+* Phylogenetic placement should associate queries with correct branches, reflecting the overall composition at a higher resolution than a taxonomy.
+
+---
+
+## Summary table
+
+| Query species | Kingdom | Class | Abundance | Novelty level |
+| --- | --- | --- | ---: | --- |
+| Nitrosococcus halophilus | Bacteria | Gammaproteobacteria | 17.5% | genus |
+| Spiribacter curvatus | Bacteria | Gammaproteobacteria | 15.7% | genus |
+| Hyperthermus butylicus | Archaea | Thermoprotei | 11.1% | kingdom |
+| Candidatus Endolissoclinum faulkneri | Bacteria | Alphaproteobacteria | 6.0% | genus |
+| Nitrosococcus oceani | Bacteria | Gammaproteobacteria | 5.7% | species |
+| Palaeococcus pacificus | Archaea | Thermococci | 5.7% | genus |
+| Sulfurovum sp. NBC37-1 | Bacteria | Epsilonproteobacteria | 5.4% | genus |
+| Spiribacter salinus | Bacteria | Gammaproteobacteria | 5.1% | species |
+| Vibrio anguillarum | Bacteria | Gammaproteobacteria | 4.6% | species |
+| Alteromonas mediterranea | Bacteria | Gammaproteobacteria | 4.0% | species |
+| Psychrobacter sp. JCM 18900 | Bacteria | Gammaproteobacteria | 2.3% | genus |
+| Ilumatobacter coccineus | Bacteria | Acidimicrobiia | 2.3% | species |
+| Aliivibrio salmonicida | Bacteria | Gammaproteobacteria | 2.2% | species |
+| Erythrobacter litoralis | Bacteria | Alphaproteobacteria | 2.2% | species |
+| Aliivibrio wodanis | Bacteria | Gammaproteobacteria | 2.2% | species |
+| Marinomonas posidonica | Bacteria | Gammaproteobacteria | 1.7% | species |
+| Thioflavicoccus mobilis | Bacteria | Gammaproteobacteria | 1.6% | family |
+| Thalassolituus oleivorans | Bacteria | Gammaproteobacteria | 1.6% | species |
+| Alteromonas macleodii | Bacteria | Gammaproteobacteria | 1.6% | species |
+| Marinithermus hydrothermalis | Bacteria | Deinococci | 1.5% | kingdom |

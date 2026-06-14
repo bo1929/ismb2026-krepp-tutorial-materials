@@ -39,12 +39,8 @@ EXTENSIONS = [
 EXTENSION_CONFIGS = {
     # Use_pygments=False gives <code class="language-X"> which we can pick up
     # with data-lang post-processing; avoids a pygments dependency at runtime.
-    "pymdownx.highlight": {
-        "use_pygments": False,
-    },
-    "pymdownx.superfences": {
-        "disable_indented_code_blocks": False,
-    },
+    "pymdownx.highlight": {"use_pygments": False},
+    "pymdownx.superfences": {"disable_indented_code_blocks": False},
 }
 
 
@@ -151,7 +147,7 @@ def _walk_hierarchical_children(children, docs_dir, items, badge_scope, group_de
 
 
 def flatten_nav_hierarchical(nav, docs_dir):
-    """Grouped nav: ``- Core Tutorial:\\n      - Overview: doc.md``
+    """Grouped nav: ``- Tutorial:\\n      - Overview: doc.md``
 
     Lone top-level ``Title: path`` rows attach to the most recent group heading.
 
@@ -331,38 +327,32 @@ def build_nav_html(flat_nav, page_indices, config):
 
         stem = path.stem
         prefix = stem.split("-")[0] if "-" in stem else stem
-        num = resolve_nav_badge(
-            config, badge_section or "", title, stem, prefix, idx,
-        )
+        num = resolve_nav_badge(config, badge_section or "", title, stem, prefix, idx)
 
         dattr_a = f' data-nav-level="{lev_a}"' if lev_a else ""
         lines.append(
-            f'<a data-page="{idx}"{dattr_a}>'
-            f'<span class="num">{num}</span> {title}'
-            "</a>"
+            f'<a data-page="{idx}"{dattr_a}>' f'<span class="num">{num}</span> {title}' "</a>"
         )
 
     return "\n      ".join(lines)
-
 
 
 # ---------------------------------------------------------------------------
 # Markdown conversion
 # ---------------------------------------------------------------------------
 
+
 def convert_md(md_path):
     """Read a markdown file and return its HTML body."""
     text = Path(md_path).read_text(encoding="utf-8")
-    md = markdown.Markdown(
-        extensions=EXTENSIONS,
-        extension_configs=EXTENSION_CONFIGS,
-    )
+    md = markdown.Markdown(extensions=EXTENSIONS, extension_configs=EXTENSION_CONFIGS)
     return md.convert(text)
 
 
 # ---------------------------------------------------------------------------
 # Post-processing
 # ---------------------------------------------------------------------------
+
 
 def wrap_tables(html):
     """Wrap bare <table> elements in <div class="table-wrap">."""
@@ -401,6 +391,7 @@ def add_data_lang(html):
 
 def ensure_pre_data_lang_attr(html):
     """Add ``data-lang=""`` to bare ``<pre>`` tags missing ``data-lang``."""
+
     def _inj(m):
         inner = m.group(1).strip()
         if re.search(r"\bdata-lang\s*=", inner, re.I):
@@ -438,12 +429,7 @@ def wrap_code_lines(html):
 
         return f"<pre{pre_attrs}><code>{''.join(wrapped_lines)}</code></pre>"
 
-    return re.sub(
-        r"<pre([^>]*)><code>(.*?)</code></pre>",
-        _wrap,
-        html,
-        flags=re.DOTALL,
-    )
+    return re.sub(r"<pre([^>]*)><code>(.*?)</code></pre>", _wrap, html, flags=re.DOTALL)
 
 
 def fix_highlight_pre(html):
@@ -452,8 +438,7 @@ def fix_highlight_pre(html):
 
 
 _PRE_IN_P = re.compile(
-    r"<p>((?:(?!</p>).)*?<pre\b[\s\S]*?</pre>(?:(?!</p>).)*)</p>",
-    re.DOTALL | re.IGNORECASE,
+    r"<p>((?:(?!</p>).)*?<pre\b[\s\S]*?</pre>(?:(?!</p>).)*)</p>", re.DOTALL | re.IGNORECASE
 )
 _PRE_CHUNK = re.compile(r"(<pre\b[^>]*>.*?</pre>)", re.DOTALL | re.IGNORECASE)
 
@@ -498,13 +483,14 @@ def postprocess(html):
 # Page HTML builder
 # ---------------------------------------------------------------------------
 
+
 def build_page_html(idx, body_html):
     return (
         f'<div class="page" id="page-{idx}">\n'
         f'<div class="page-inner">\n'
-        f'{body_html}\n'
-        f'</div>\n'
-        f'</div>'
+        f"{body_html}\n"
+        f"</div>\n"
+        f"</div>"
     )
 
 
@@ -565,8 +551,15 @@ def handbook_meta(config) -> dict:
     }
 
 
-def fill_isolated_page(template: str, meta: dict, page_title: str, page_counter: str,
-                       body_html: str, prev_nav: str, next_nav: str) -> str:
+def fill_isolated_page(
+    template: str,
+    meta: dict,
+    page_title: str,
+    page_counter: str,
+    body_html: str,
+    prev_nav: str,
+    next_nav: str,
+) -> str:
     repl = {
         "{{HTML_LANG}}": html_escape.escape(meta["html_lang"], quote=False),
         "{{HTML_TITLE}}": html_escape.escape(meta["html_title"], quote=False),
@@ -611,27 +604,21 @@ def collect_index_sections(flat_nav, page_entries, config):
         prefix = stem.split("-")[0] if "-" in stem else stem
         idx = path_to_index.get(str(path), 0)
         num = resolve_nav_badge(config, badge_section or "", title, stem, prefix, idx)
-        current["lessons"].append({
-            "title": title,
-            "href": slug,
-            "num": num,
-        })
+        current["lessons"].append({"title": title, "href": slug, "num": num})
 
     if current["lessons"]:
         sections.append(current)
 
     if not sections and page_entries:
-        sections.append({
-            "heading": "Lessons",
-            "lessons": [
-                {
-                    "title": t,
-                    "href": page_output_name(p),
-                    "num": str(i + 1),
-                }
-                for i, (t, p, _) in enumerate(page_entries)
-            ],
-        })
+        sections.append(
+            {
+                "heading": "Lessons",
+                "lessons": [
+                    {"title": t, "href": page_output_name(p), "num": str(i + 1)}
+                    for i, (t, p, _) in enumerate(page_entries)
+                ],
+            }
+        )
 
     return sections
 
@@ -705,7 +692,9 @@ def build_isolated_pages(root, config, page_entries, page_template_text, prose_s
         prev_href = page_output_name(page_entries[idx - 1][1]) if idx > 0 else None
         next_href = page_output_name(page_entries[idx + 1][1]) if idx + 1 < total else None
         prev_label = f"\u2190 {page_entries[idx - 1][0]}" if idx > 0 else meta["footer_prev"]
-        next_label = f"{page_entries[idx + 1][0]} \u2192" if idx + 1 < total else meta["footer_next"]
+        next_label = (
+            f"{page_entries[idx + 1][0]} \u2192" if idx + 1 < total else meta["footer_next"]
+        )
 
         html = fill_isolated_page(
             page_template,
@@ -777,12 +766,13 @@ def fill_handbook_placeholders(template, config):
 # Main
 # ---------------------------------------------------------------------------
 
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--root", default=None,
-                    help="Root directory (default: parent of scripts/)")
-    ap.add_argument("--config", default=None,
-                    help="tutorial config YAML (default: <root>/config.yml)")
+    ap.add_argument("--root", default=None, help="Root directory (default: parent of scripts/)")
+    ap.add_argument(
+        "--config", default=None, help="tutorial config YAML (default: <root>/config.yml)"
+    )
     args = ap.parse_args()
 
     scripts_dir = Path(__file__).parent.resolve()
@@ -839,10 +829,8 @@ def main():
     template = template_path.read_text(encoding="utf-8")
     prose_styles = extract_template_styles(template)
     template = fill_handbook_placeholders(template, config)
-    output = (
-        template
-        .replace("{{NAV}}", nav_html)
-        .replace("{{PAGES}}", "\n\n    ".join(pages_html_parts))
+    output = template.replace("{{NAV}}", nav_html).replace(
+        "{{PAGES}}", "\n\n    ".join(pages_html_parts)
     )
 
     pages_dir.mkdir(parents=True, exist_ok=True)

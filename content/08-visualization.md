@@ -35,9 +35,10 @@ viewer.
 - **Thick blue branches** - many placements; dominant organisms in the sample.
 - **Thin / grey branches** - few or no placements.
 
-Branches leading to **surrogate references** (different assembly/genus than the
-mixture source) often appear thicker than naive abundance-from-profile estimates
-would predict - parallel to `krepp dist --summarize` inflation.
+Branches leading to the **closest available references** (different assembly,
+species, or genus than the mixture source) often appear thicker than naive
+abundance-from-profile estimates would predict - parallel to
+`krepp dist --summarize` inflation.
 
 Internal branches above pairs of related references thicken when reads distribute
 between terminals and the ancestral edge.
