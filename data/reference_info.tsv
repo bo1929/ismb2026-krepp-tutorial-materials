@@ -19,7 +19,7 @@ i	label	novelty_level	profile_taxid	profile_genus	ref_accession	ref_taxid	ref_or
 18	Vibrio_anguillarum	species	55601	Vibrio	GCF_003390515.1	55601	Vibrio anguillarum	1236	Gammaproteobacteria	GCF_049315005.1
 19	Thalassolituus_oleivorans	species	187493	Thalassolituus	GCF_001932535.1	187493	Thalassolituus oleivorans	1236	Gammaproteobacteria	GCF_000355675.1
 20	Ilumatobacter_coccineus	species	467094	Ilumatobacter	GCA_002748455.1	467094	Ilumatobacter coccineus	84992	Acidimicrobiia	GCF_000348785.1
-21	Ilumatobacter_sp	genus		Ilumatobacter	GCF_965215205.1	1967498	Ilumatobacter sp.	84992	Acidimicrobiia	
+21	Ilumatobacter_sp_AH-269-C13	genus		Ilumatobacter	GCF_965215205.1	1967498	Ilumatobacter sp. AH-269-C13	84992	Acidimicrobiia
 22	Nitrosococcus_wardiae	genus		Nitrosococcus	GCF_004421105.1	1814290	Nitrosococcus wardiae	1236	Gammaproteobacteria	
 23	Alteromonas_stellipolaris	genus		Alteromonas	GCF_001562195.1	233316	Alteromonas stellipolaris	1236	Gammaproteobacteria	
 24	Marinomonas_mediterranea	genus		Marinomonas	GCF_000192865.1	119864	Marinomonas mediterranea	1236	Gammaproteobacteria	

@@ -30,7 +30,7 @@ Large or generated assets are listed in `.gitignore` (indexes built during the c
 
 ## Content structure
 
-All lessons live under `content/` as numbered Markdown files. Order and sidebar grouping are defined in `config.yml` under `nav` (currently a single block, **Core Tutorial**).
+All lessons live under `content/` as numbered Markdown files. Order and sidebar grouping are defined in `config.yml` under `nav` (currently a single block, **Tutorial**).
 
 | File | Lesson (nav title) | Role in the flow |
 |------|-------------------|------------------|

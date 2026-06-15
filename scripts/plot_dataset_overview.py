@@ -403,6 +403,7 @@ def save_figure(fig, path, *, tight=True):
     if tight:
         kwargs["bbox_inches"] = "tight"
     fig.savefig(path, **kwargs)
+    fig.savefig(str(path).replace(".png", ".pdf"), **kwargs)
 
 
 def safe_tip_label(text: str) -> str:
@@ -795,8 +796,8 @@ def plot_reference_phylogeny(newick_path: Path, entries: list[dict]):
         return _depth_from_root(node)
 
     # ── tip metadata ─────────────────────────────────────────────────────
-    # Build raw display labels first so we can detect duplicates.
-    raw_labels = []
+    # ── tip metadata ─────────────────────────────────────────────────────
+    display_labels = []
     tip_colors = []
     tip_x = []
     tip_y = []
@@ -804,25 +805,14 @@ def plot_reference_phylogeny(newick_path: Path, entries: list[dict]):
         label = _tip_name(leaf)
         entry = meta.get(label, {"kind": "reference", "display": label.replace("_", " ")})
         is_query = entry["kind"] == "query"
-        raw_labels.append(entry["display"])
+        display_labels.append(entry["display"])
         tip_colors.append(TREE_QUERY_COLOR if is_query else TREE_REF_COLOR)
         tip_x.append(x_pos(leaf))
         tip_y.append(y_by_leaf[leaf])
 
-    # Disambiguate duplicate species with suffix markers (*, ~, +, …).
-    SUFFIXES = ["*", "~", "+"]
-    seen: dict[str, int] = {}
-    display_labels = []
-    for name in raw_labels:
-        count = seen.get(name, 0)
-        seen[name] = count + 1
-        if count > 0:
-            suffix = SUFFIXES[min(count - 1, len(SUFFIXES) - 1)]
-            display_labels.append(f"{name} {suffix}")
-        else:
-            display_labels.append(name)
-
-    # All tip labels are italic.
+    # All tip labels are italic.  Query tips are already distinguishable by
+    # their orange colour, so no suffix disambiguation is needed for
+    # species that appear as both reference and query.
     italic_flags = [True] * len(leaves)
 
     n_rows = len(leaves)
