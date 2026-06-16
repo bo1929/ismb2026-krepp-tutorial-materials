@@ -1,0 +1,41 @@
+krepp version: v0.8.2
+Invocation: krepp place -i /Users/asapci/Downloads/krepp-tutorial/ismb2026-krepp-tutorial-materials/data/toy-index -q /Users/asapci/Downloads/krepp-tutorial/ismb2026-krepp-tutorial/data/query_mixture.fq.gz -l /Users/asapci/Downloads/krepp-tutorial/ismb2026-krepp-tutorial/data/lineages_refs.tsv --summarize --num-threads 4
+Tue Jun 16 10:58:54 2026
+Loading the index and the backbone tree...
+Placing given sequences on the taxonomic lineage...
+# software: krepp	version: v0.8.2	invocation :krepp place -i /Users/asapci/Downloads/krepp-tutorial/ismb2026-krepp-tutorial-materials/data/toy-index -q /Users/asapci/Downloads/krepp-tutorial/ismb2026-krepp-tutorial/data/query_mixture.fq.gz -l /Users/asapci/Downloads/krepp-tutorial/ismb2026-krepp-tutorial/data/lineages_refs.tsv --summarize --num-threads 4
+# ((Palaeococcus_ferrophilus{0},Pyrodictium_occultum{1})Archaea{2},(Aliivibrio_salmonicida{3},Aliivibrio_wodanis{4},Allochromatium_vinosum{5},Alteromonas_macleodii{6},Alteromonas_mediterranea{7},Alteromonas_stellipolaris{8},Bacillus_subtilis{9},Bacteroides_fragilis{10},Candidatus_Endolissoclinum_sp{11},Erythrobacter_aurantius{12},Erythrobacter_litoralis{13},Fusobacterium_nucleatum{14},Ilumatobacter_coccineus{15},Ilumatobacter_sp_AH-269-C13{16},Marinomonas_mediterranea{17},Marinomonas_posidonica{18},Mycobacterium_tuberculosis{19},Nitrosococcus_oceani{20},Nitrosococcus_wardiae{21},Nitrosococcus_watsonii{22},Psychrobacter_cryohalolentis{23},Spiribacter_roseus{24},Spiribacter_salinus{25},Staphylococcus_aureus{26},Sulfurovum_mangrovi{27},Thalassolituus_oleivorans{28},Thermus_thermophilus{29},Vibrio_anguillarum{30})Bacteria{31})root{32};
+DISTAL_NODE	EDGE_NUM	WEIGHTED_COUNT	SEQUENCE_ABUNDANCE
+Palaeococcus_ferrophilus	0	117.97778	0.00307
+Sulfurovum_mangrovi	27	112.62132	0.00293
+Staphylococcus_aureus	26	4.81951	0.00013
+Candidatus_Endolissoclinum_sp	11	70.33022	0.00183
+Archaea	2	5.05486	0.00013
+Erythrobacter_aurantius	12	183.88704	0.00478
+Spiribacter_roseus	24	3076.33244	0.08003
+Nitrosococcus_oceani	20	5978.77473	0.15553
+Bacillus_subtilis	9	4.71534	0.00012
+Thalassolituus_oleivorans	28	1420.34035	0.03695
+Nitrosococcus_watsonii	22	389.08902	0.01012
+Vibrio_anguillarum	30	3885.75639	0.10108
+Pyrodictium_occultum	1	0.66368	0.00002
+Psychrobacter_cryohalolentis	23	279.43978	0.00727
+Alteromonas_stellipolaris	8	31.47473	0.00082
+Thermus_thermophilus	29	1.38201	0.00004
+Aliivibrio_salmonicida	3	2196.32722	0.05713
+Ilumatobacter_coccineus	15	8.42063	0.00022
+Spiribacter_salinus	25	4334.27778	0.11275
+Fusobacterium_nucleatum	14	0.09402	0.00000
+Erythrobacter_litoralis	13	93.98863	0.00244
+Nitrosococcus_wardiae	21	9251.93151	0.24067
+Aliivibrio_wodanis	4	1634.96055	0.04253
+Marinomonas_mediterranea	17	60.42527	0.00157
+Alteromonas_macleodii	6	1703.06223	0.04430
+Marinomonas_posidonica	18	542.90583	0.01412
+Alteromonas_mediterranea	7	3020.90807	0.07858
+Allochromatium_vinosum	5	21.42788	0.00056
+Bacteroides_fragilis	10	3.23985	0.00008
+Mycobacterium_tuberculosis	19	7.37132	0.00019
+Done placing queries, elapsed: 0.953296 sec
+Total number of sequences queried: 100000
+Tue Jun 16 10:58:55 2026

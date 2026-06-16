@@ -1,35 +1,27 @@
 # Overview
 
-## What is krepp?
-
-**krepp** is a *k*-mer-based tool for searching and finding query sequences in large reference genome collections, estimating the distance between them, and placement of on backbone phylogenies and/or taxonomies. It uses locality-sensitive hashing (LSH), a phylogeny-guided *k*-mer coloring algorithm, and a maximum-likelihood framework to achieve these.
+**krepp** is a *k*-mer-based tool for searching and finding query sequences in large reference genome collections, estimating the distance between reads and reference genomes, and placing them on backbone phylogenies and/or taxonomies.
+It uses locality-sensitive hashing (LSH), a phylogeny-guided *k*-mer coloring algorithm, and a maximum-likelihood framework to achieve these.
 
 ---
 
 ## What we will cover
 
-This tutorial walks through the core krepp workflow using a controlled mock community of 20 marine microbial genomes simulated at 100,000 Illumina reads. We will work with two reference sets:
+This tutorial walks through the core krepp workflow using a controlled mock microbial community consisting of 20 marine genomes simulated at 100,000 Illumina reads.
+We will work with two small reference sets to avoid heavy computation during the tutorial.
+We will index one toy reference set with controlled novelty and limited relatedness to queries and directly download another, diverse but heavily down-sampled microbial index.
 
-- **A 31-genome toy index** with controlled taxonomic novelty, for learning and interpretation.
-- **A Web of Life (WoL) tiny index** (>10,000 genomes), to demonstrate the same pipeline at scale.
+The tutorial consists of five main sections:
 
-| Step | Command | What it does |
-|------|---------|---------------|
-| 1. Index | `krepp index` | Build a searchable index from reference genomes |
-| 2. Distance | `krepp dist` | Estimate per-read distances to references |
-| 3. Placement | `krepp place -t` | Place reads on a reference phylogeny |
-| 4. Taxonomy | `krepp place -l` | Place reads on a taxonomic tree via lineages |
-| 5. Visualize | gappa | Render placements as heat-trees |
-
-1. Build a krepp index from reference genomes
-2. Estimate read-to-reference distances and interpret them by novelty level.
-3. Place reads on a reference phylogeny and visualise the result with gappa.
-4. Use taxonomic lineages to annotate placements and compare against ground truth.
-5. Apply the same commands to a large-scale index (WoL) and compare results.
+1. Installation of the tools and downloading the tutorial datasets.
+2. Indexing reference genomes and using one of the available pre-built indexes.
+3. Estimating read-to-genome distances and interpretation of distances.
+4. Placing reads on a reference phylogeny (or a taxonomy) and visualising the result with `gappa`.
+5. Exercises with a more realistic reference index and conclusions.
 
 ## Resources
 
-- Slides for the first part of this tutorial (key results and overview)
-- Genome Biology paper (methodological details and detailed benchmarking)
-- IMSI Software Workshop (an earlier tutorial version but remains valid)
-- RECOMB 2025 (a presentation focusing on method and results)
+- [Slides](https://bo1929.github.io/presentations/krepp-ismb-2026.pdf) for the first part of this tutorial.
+- [The main paper (Genome Biology)](https://doi.org/10.1186/s13059-026-03999-y) with methodological details and extensive benchmarking.
+- [Another tutorial (in IMSI, 2025)](https://bo1929.github.io/presentations/krepp-imsi-2025.pdf) for an earlier version which remains mostly valid.
+- [Slides (from RECOMB 2025)](https://bo1929.github.io/presentations/krepp-recomb-2025.pdf) focusing on method and results.
