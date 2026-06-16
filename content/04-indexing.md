@@ -133,7 +133,7 @@ If you only want to test different parameters and options without overwriting th
     `krepp` partitions the index into `-m` (more or less) equally sized pieces; these partitions can be built independently but queried together.
     The `-r` option determines which partition is constructed: if `--no-frac` is given, only the `-r`th partition is built; otherwise all partitions from 0th to `-r`th are built and saved (see `krepp index --help` for details).
     You don't need to construct all partitions; `krepp` will search in whatever is available, and these partitions can be distributed independently.
-    The default is `-m 4 -r 1 --frac`, so 50% (0th and 1st of 4 partitions) of the minimized *k*-mers will be indexed.
+    The **default** is `-m 4 -r 1 --frac`, so 50% (0th and 1st out of 4 partitions) of the minimized *k*-mers will be indexed.
     The only requirement is keeping the `-m` value (and of course `-i` and `-t`) fixed across all partitions.
     For instance, one can index 3% of the reference *k*-mers and construct a lightweight index by running:
     ```bash
@@ -175,7 +175,7 @@ If you only want to test different parameters and options without overwriting th
 ## Installing pre-built indexes
 
 We will use the Web of Life index (tiny version <2 GB) which includes a microbial phylogeny (>10,000 leaves).
-!!! tip
+!!! tip ""
     You do not need to run the command below if you already followed the steps in the **Setup** section.
     Note that this index is intentionally made extremely lightweight for this tutorial and may underperform for complex samples compared to larger indexes.
 ```bash

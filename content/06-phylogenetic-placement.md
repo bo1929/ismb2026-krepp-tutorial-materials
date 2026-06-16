@@ -1,6 +1,6 @@
 # Phylogenetic Placement: `krepp place`
 
-- `krepp place` uses distance estimates to find placements on a given phylogeny that best explains distances for queries.
+- `krepp place` uses distance estimates to find placements on a given phylogeny that best explain the distances for each query.
 - For each query sequence (e.g., a read), after finding reference hits and estimating ML distances, krepp looks for large clades in the phylogeny that are indistinguishable from the minimum-distance leaf (i.e., closest reference genome).
 - In this mode, a reference phylogeny must be provided via the `-t` option; its tip labels must match the reference IDs in the input file (`-i`) used during indexing.
 - If a guide tree was provided during indexing, krepp uses that tree for placement unless it is overridden via `-t`.
@@ -9,9 +9,10 @@ Incorporating the relationships between reference genomes into the analysis, phy
 
 ---
 
-## Placing reads on a backbone phylogeny
-By default, krepp reports multiple placements for each query, weighted by likelihood ratios, and filters out placements with only a few *k*-mer matches (i.e., low evidence). For a given backbone phylogeny in Newick format (`data/reference_tree.nwk`), run:
+## Placing reads on a phylogeny
+By default, krepp reports multiple placements for each query, weighted by likelihood ratios, and filters out placements with only a few *k*-mer matches (i.e., low evidence).
 
+For a given backbone phylogeny in Newick format (`data/reference_tree.nwk`), run:
 ```bash
 krepp place -i data/toy-index -q data/query_mixture.fq.gz \
     -t data/reference_tree.nwk --num-threads 4 -o results/placements_default.jplace
@@ -27,15 +28,15 @@ head results/placements_default.jplace
     * The `.jplace` file stores a decorated tree, labeling each edge of the input tree given via `-t` with `{edge_num}`.
     ```json
 	{
-			"version" : 3,
-			"fields" : ["edge_num", "pendant_length", "distal_length", "likelihood", "like_weight_ratio", "distance"],
-			"placements" : [
-							{"n" : ["NC_015559.1-12009"], "p" : [[22, 0.02798, 0.06314, -17.19396, 1.00000, 0.08581]]},
-							{"n" : ["NC_015559.1-3949"], "p" : [[22, 0.09093, 0.06314, -17.99522, 1.00000, 0.13928]]},
-							{"n" : ["NC_022664.1-43244"], "p" : [
-									[14, 0.13809, 0.03122, -16.87034, 0.44321, 0.15156],
-									[6, 0.12885, 0.01378, -27.72109, 0.55679, 0.12989]]
-							},
+	"version" : 3,
+	"fields" : ["edge_num", "pendant_length", "distal_length", "likelihood", "like_weight_ratio", "distance"],
+	"placements" : [
+					{"n" : ["NC_015559.1-12009"], "p" : [[22, 0.02798, 0.06314, -17.19396, 1.00000, 0.08581]]},
+					{"n" : ["NC_015559.1-3949"], "p" : [[22, 0.09093, 0.06314, -17.99522, 1.00000, 0.13928]]},
+					{"n" : ["NC_022664.1-43244"], "p" : [
+							[14, 0.13809, 0.03122, -16.87034, 0.44321, 0.15156],
+							[6, 0.12885, 0.01378, -27.72109, 0.55679, 0.12989]]
+					},
 	```
     * For more details, refer to the paper describing the format:  *"Matsen FA, Hoffman NG, Gallagher A, Stamatakis A (2012) A Format for Phylogenetic Placements. PLOS ONE 7(2): e31009. https://doi.org/10.1371/journal.pone.0031009"*.
 
@@ -87,58 +88,73 @@ head results/placements_tabular.tsv
     ```
     # software: krepp   version: v0.8.2 invocation :krepp place -i data/toy-index -q data/query_mixture.fq.gz -t data/reference_tree.nwk --tabular --num-threads 4
     # (((Thalassolituus_oleivorans:0.04096{0},Sulfurovum_mangrovi:0.36463{1}):0.10560{2},(((Ilumatobacter_sp_AH-269-C13:0.12736{3},Ilumatobacter_coccineus:0.18559{4}):0.18819{5},(Spiribacter_roseus:0.02756{6},(Spiribacter_salinus:0.25239{7},(Candidatus_Endolissoclinum_sp:0.14462{8},(Erythrobacter_aurantius:0.14409{9},Erythrobacter_litoralis:0.07738{10}):0.06494{11}):0.10243{12}):0.03647{13}):0.06245{14}):0.15524{15},(Bacteroides_fragilis:0.50000{16},Palaeococcus_ferrophilus:0.50000{17}):0.06083{18}):0.10569{19}):0.03098{20},((Marinomonas_mediterranea:0.11388{21},(Marinomonas_posidonica:0.12629{22},((Staphylococcus_aureus:0.10455{23},(Moorella_thermoacetica:0.25831{24},Fusobacterium_nucleatum:0.14728{25}):0.07209{26}):0.12974{27},(Bacillus_subtilis:0.14246{28},(Thermus_thermophilus:0.15808{29},(Pyrodictium_occultum:0.19841{30},Mycobacterium_tuberculosis:0.20717{31}):0.04471{32}):0.02593{33}):0.12215{34}):0.07715{35}):0.04304{36}):0.09730{37},((Alteromonas_stellipolaris:0.15275{38},((Nitrosococcus_wardiae:0.08166{39},(Nitrosococcus_watsonii:0.09813{40},Nitrosococcus_oceani:-0.00904{41}):0.11275{42}):0.10015{43},(Vibrio_anguillarum:0.08961{44},(Aliivibrio_salmonicida:0.07676{45},Aliivibrio_wodanis:0.07034{46}):0.09247{47}):0.04989{48}):0.01565{49}):0.03886{50},(Alteromonas_mediterranea:0.06015{51},(Alteromonas_macleodii:0.05276{52},(Psychrobacter_cryohalolentis:0.14239{53},Allochromatium_vinosum:0.23019{54}):0.15003{55}):0.01706{56}):0.02411{57}):0.05419{58}):0.02465{59}){60};
-    SEQ_ID  DISTAL_NODE EDGE_NUM    LWR DIST
-    NC_015559.1-12009   Marinomonas_posidonica  22  1.00000 0.08581
-    NC_015559.1-3949    Marinomonas_posidonica  22  1.00000 0.13928
-    NC_022664.1-43244   Spiribacter_roseus  6   0.55679 0.12989
-    NC_022664.1-43244   NA  14  0.44321 0.15156
-    NC_011312.1-6343    Aliivibrio_salmonicida  45  1.00000 0.00009
-    NC_013960.1-152360  Nitrosococcus_wardiae   39  1.00000 0.11037
-    NZ_CP186025.1-22373 Vibrio_anguillarum  44  1.00000 0.00875
+    SEQ_ID	DISTAL_NODE	EDGE_NUM	LWR DIST
+    NC_015559.1-12009	Marinomonas_posidonica	22	1.00000	0.08581
+    NC_015559.1-3949	Marinomonas_posidonica	22	1.00000	0.13928
+    NC_022664.1-43244	Spiribacter_roseus	6	0.55679	0.12989
+    NC_022664.1-43244	NA	14	0.44321	0.15156
+    NC_011312.1-6343	Aliivibrio_salmonicida	45	1.00000	0.00009
+    NC_013960.1-152360	Nitrosococcus_wardiae	39	1.00000	0.11037
+    NZ_CP186025.1-22373	Vibrio_anguillarum	44	1.00000	0.00875
     ```
     * Each read may appear on multiple rows (one per placed branch), with an LWR summing to 1.0 across rows.
-    * If the distal node is not labeled, `DISTAL_NODE = NA` will be outputted even for placed reads but with a non-NA `EDGE_NUM` value.
-    * An LWR of 1.0 on a terminal node means the read maps to that reference without nay ambiguity.
+    * If the distal node is not labeled, `DISTAL_NODE = NA` is output even for placed reads, with a non-NA `EDGE_NUM`.
+    * An LWR of 1.0 on a terminal node means the read maps to that reference without any ambiguity.
 
-- To aggregate placements across all reads into per-branch abundances and report in a tabular format similar to above, we can use `--summarize` option.
+- To aggregate placements across all reads into per-branch abundances, use the `--summarize` option:
 ```bash
 krepp place -i data/toy-index -q data/query_mixture.fq.gz \
-    -t data/reference_tree.nwk --summarize --num-threads 4 > results/place_summarized.tsv
+    -t data/reference_tree.nwk --summarize --num-threads 4 > results/placements_summarized.tsv
 ```
 
 ## Placing on a taxonomy
 
-- In addition to a phylogenetic tree, krepp can also place sequences on a taxonomy (which is a multi-furcating tree without branch lengths) using the same branch length agnostic algorithm.
-- For taxonomic placement, krepp requires a tab-separated lineage file (`-l`) is required to map each reference name to a semicolon-separated GTDB-style path (e.g., `REF_XYZ	k__Bacteria;p__Proteobacteria;…;s__Escherichia coli`).
-- The `-t` (tree) and `-l` (lineage) flags are mutually exclusive: use `-l` with the path to the lineage file for a taxonomy-based placement and `-t` with the path to the Newick file for phylogentic placement.
+- In addition to a phylogenetic tree, krepp can also place sequences on a taxonomy (which is a multi-furcating tree without branch lengths) using the same branch length agnostic placement algorithm.
+- For taxonomic placement, krepp requires a tab-separated lineage file (`-l`) mapping each reference name to a semicolon-separated GTDB-style path (e.g., `XYZ	k__Bacteria;p__Proteobacteria;...;s__Escherichia coli`, see an example [here](https://github.com/bo1929/krepp/blob/master/test/lineages_toy.txt)).
+- The `-t` (tree) and `-l` (lineage) flags are mutually exclusive: use `-l` with the path to the lineage file for a taxonomy-based placement and `-t` with the path to the Newick file for phylogenetic placement.
 
-??? question "Example lineage file"
-    A tab-separated file linking reference IDs to their taxonomic paths:
+??? question "Example lineages:"
+    A tab-separated file linking reference IDs (same as the ones in input map given via `-i`) to their taxonomic lineages:
     ```
-    Aliivibrio_salmonicida   k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;…
-    Vibrio_anguillarum       k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;…
+    XYZ	k__Bacteria; p__Chloroflexota; c__; o__; f__; g__Roseiflexus; s__
+    ABC	k__Bacteria; p__Chloroflexota; c__; o__; f__; g__Chloroflexus; s__Chloroflexus aurantiacus
+    123	k__Bacteria; p__Chloroflexota; c__; o__; f__; g__Thermomicrobium; s__Thermomicrobium roseum
+    A00	k__Bacteria; p__Chloroflexota; c__; o__; f__; g__Dehalococcoides; s__Dehalococcoides mccartyi
+    A11	k__Bacteria; p__Chloroflexota; c__; o__; f__; g__Dehalococcoides; s__Dehalococcoides mccartyi
     ```
+    Note that multiple genomes may have the same lineage (i.e., they are same species) and missing labels and empty ranks are also compatible.
 
 ```bash
-krepp place -i data/toy-index -q data/query_mixture.fq.gz \
-    -l data/lineages_refs.tsv --summarize --num-threads 4 \
-    > results/place_tax_summarize.tsv
-```
-
-The output aggregates placement mass across the taxonomy tree:
-
-```bash
-head results/place_tax_summarize.tsv
+krepp place -i data/toy-index -q data/query_mixture.fq.gz -l data/reference_taxonomy_lineages.tsv \
+    --tabular -o results/taxplacements_tabular.tsv
+head results/taxplacements_tabular.tsv | grep -v "#"
 ```
 ??? question "Expected output:"
     ```
-    DISTAL_NODE              EDGE_NUM  WEIGHTED_COUNT  SEQUENCE_ABUNDANCE
-    Vibrio                   14        204.88476       0.00533
-    Alteromonas_mediterranea 29        2575.54290      0.06700
-    Alteromonas_macleodii    27        1457.59004      0.03792
-    Nitrosococcus            39        334.54889       0.00870
-    Spiribacter              44        189.23112       0.00492
+    SEQ_ID	DISTAL_NODE	EDGE_NUM	LWR	DIST
+    NC_015559.1-12009	Marinomonas_posidonica	37	1.00000	0.08579
+    NC_015559.1-3949	Marinomonas_posidonica	37	1.00000	0.13930
+    NC_022664.1-43244	Spiribacter	57      0.47172	0.14497
+    NC_022664.1-43244	Spiribacter_roseus	53	0.52828	0.12986
+    NC_011312.1-6343	Aliivibrio_salmonicida	13	1.00000	0.00001
+    NC_013960.1-152360	Nitrosococcus_wardiae	47	1.00000	0.11041
+    NZ_CP186025.1-22373	Vibrio_anguillarum	18	1.00000	0.00872
     ```
 
-- `DISTAL_NODE` is the taxonomic name (species, genus, or higher).
-- Rows at genus level and above aggregate mass from all reads mapping within that clade.
+Similar to phylogenetic placement, you can use the `--summarize` option to aggregate placement across all reads and report weighted count values and normalized sequence abundances.
+Please note that sequence abundances are not equivalent to taxonomic profiles as the normalization is done across all ranks not per rank (i.e., species level profile).
+
+```bash
+krepp place -i data/toy-index -q data/query_mixture.fq.gz \
+    -l data/reference_taxonomy_lineages.tsv -o results/taxplacements_summarized.tsv
+head results/taxplacements_summarized.tsv
+grep "^Nitrosococcus" results/taxplacements_summarized.tsv
+```
+??? question "Expected output:"
+    ```
+    Nitrosococcus_watsonii  49      301.26923       0.00784
+    Nitrosococcus_oceani    45      5874.38590      0.15279
+    Nitrosococcus_wardiae   47      8900.17328      0.23149
+    Nitrosococcus   51      531.75661       0.01383
+    ```
+    Columns: `DISTAL_NODE`, `EDGE_NUM`, `WEIGHTED_COUNT`, and  `SEQUENCE_ABUNDANCE`.

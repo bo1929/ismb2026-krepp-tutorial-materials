@@ -11,7 +11,7 @@
 
 By default, krepp reports distances between individual sequences and all relevant references:
 ```bash
-krepp dist -i data/toy-index -q data/query_mixture.fq.gz --num-threads 4 -o results/distances_default.tsv
+krepp dist -i data/toy-index -q data/query_mixture.fq.gz --num-threads 4 > results/distances_default.tsv
 ```
 
 The output is in a tab-separated format, consisting of three columns:
@@ -110,12 +110,12 @@ Family and kingdom-level queries have much lower mapping rates, reflecting the a
 
 **Figure 4.** Genome-wide distance (measured by Mash) vs. average per-read distance measured by krepp for each query organism's closest reference genome. **Left:** top-5 species-level queries by mapping rate. Pairs cluster tightly near the diagonal at distances below 2%, showing close agreement between krepp per-read estimates and whole-genome Mash distances. **Right:** top-5 genus-level queries, for which krepp means track Mash distances across a wider range (0.10–0.27). *Nitrosococcus halophilus* hits *N. wardiae* at exactly 0.0953 on both axes. However, at very high genome-wide distances, krepp starts to underestimate due to the large portion of reads that are not mapped, and also due to mapping bias towards reads that come from more conserved regions. **Bottom:** mapping rate (fraction of reads with at least 1 hit) for the same 10 organisms, ranging from 99.9% (*Alteromonas macleodii*) down to 12.6% (*Palaeococcus pacificus*).
 
-!!! danger
+!!! danger ""
     Please note that this is only a toy example where we utilized a very small number of arbitrarily chosen reference genomes. We also downsampled considerably using minimizers and FracMinHash to obtain a small index for the sake of the tutorial. Actual mapping rates and distance accuracy may change in a more realistic setting with more resources and time, most likely in a positive direction!
 
 ---
 
-## Summarizing operational genomic units
+## Counting operational genomic units
 - Instead of retaining the per-read distance estimation, one could summarize the entire query file (i.e., a sample) in operational genomic units (OGUs).
 - Although the interpretation is different from taxonomic abundance profiles, an OGU table provides a useful high-level view on the entire composition.
 - Each read is counted as 1, and its contribution to each genomic unit (i.e., a single reference) is disproportional to the number of equally good matches.

@@ -796,8 +796,7 @@ def plot_reference_phylogeny(newick_path: Path, entries: list[dict]):
         return _depth_from_root(node)
 
     # ── tip metadata ─────────────────────────────────────────────────────
-    # ── tip metadata ─────────────────────────────────────────────────────
-    display_labels = []
+    raw_labels = []
     tip_colors = []
     tip_x = []
     tip_y = []
@@ -805,14 +804,24 @@ def plot_reference_phylogeny(newick_path: Path, entries: list[dict]):
         label = _tip_name(leaf)
         entry = meta.get(label, {"kind": "reference", "display": label.replace("_", " ")})
         is_query = entry["kind"] == "query"
-        display_labels.append(entry["display"])
+        raw_labels.append(entry["display"])
         tip_colors.append(TREE_QUERY_COLOR if is_query else TREE_REF_COLOR)
         tip_x.append(x_pos(leaf))
         tip_y.append(y_by_leaf[leaf])
 
-    # All tip labels are italic.  Query tips are already distinguishable by
-    # their orange colour, so no suffix disambiguation is needed for
-    # species that appear as both reference and query.
+    # Disambiguate duplicate species with suffix markers (*, ~, +).
+    SUFFIXES = ["*", "~", "+"]
+    seen: dict[str, int] = {}
+    display_labels = []
+    for name in raw_labels:
+        count = seen.get(name, 0)
+        seen[name] = count + 1
+        if count > 0:
+            suffix = SUFFIXES[min(count - 1, len(SUFFIXES) - 1)]
+            display_labels.append(f"{name} {suffix}")
+        else:
+            display_labels.append(name)
+
     italic_flags = [True] * len(leaves)
 
     n_rows = len(leaves)
