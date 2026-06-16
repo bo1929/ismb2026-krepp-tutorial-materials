@@ -58,7 +58,7 @@ Others share only **genus**, **family**, or **kingdom** with their best matching
 - We will use a similar phylogeny after excluding the queries to perform phylogenetic placement of the reads in the query mixture.
 
 
-<img src="figures/dataset_reference_phylogeny.png" alt="Mash neighbor-joining tree with all 31 reference genomes and all 20 query genomes as tips." style="display: block; margin: 1rem auto; width: 100%; max-width: 900px; height: auto;" />
+<img src="figures/dataset_reference_phylogeny.png" alt="Mash neighbor-joining tree with all 31 reference genomes and all 20 query genomes as tips." style="display: block; margin: 1rem auto; width: 100%; max-width: 1000px; height: auto;" />
 **Figure 2.**
 A toy phylogeny built using Mash distances and neighbor-joining.
 Although this may not be the most reliable method for obtaining a microbial phylogeny (as Mash distances do not extend well to highly divergent genomes, which we have in our case), it is good enough for our purposes.

@@ -1,95 +1,144 @@
-# Phylogenetic Placement - `krepp place`
+# Phylogenetic Placement: `krepp place`
 
-`krepp place` extends distance estimation to tree placement: given the
-per-reference distances for a read, it computes a likelihood-weighted
-placement on every branch of the reference phylogeny.
+- `krepp place` uses distance estimates to find placements on a given phylogeny that best explains distances for queries.
+- For each query sequence (e.g., a read), after finding reference hits and estimating ML distances, krepp looks for large clades in the phylogeny that are indistinguishable from the minimum-distance leaf (i.e., closest reference genome).
+- In this mode, a reference phylogeny must be provided via the `-t` option; its tip labels must match the reference IDs in the input file (`-i`) used during indexing.
+- If a guide tree was provided during indexing, krepp uses that tree for placement unless it is overridden via `-t`.
 
-Commands assume **`data-new/ref_index`** and **`data-new/query_mixture.fq.gz`**.
-
----
-
-## jplace output
-
-```bash
-krepp place -i data-new/ref_index -q data-new/query_mixture.fq.gz \
-    --num-threads 4 -o results/placements.jplace
-```
-
-The `.jplace` format (JSON) is the standard for evolutionary placement
-algorithms (EPA, pplacer). It embeds the reference tree and a placement
-record per read, and is directly consumable by gappa and iTOL.
+Incorporating the relationships between reference genomes into the analysis, phylogenetic placement provides a more interpretable and complete view of the queries.
 
 ---
 
-## Tabular placement output
+## Placing reads on a backbone phylogeny
+By default, krepp reports multiple placements for each query, weighted by likelihood ratios, and filters out placements with only a few *k*-mer matches (i.e., low evidence). For a given backbone phylogeny in Newick format (`data/reference_tree.nwk`), run:
 
 ```bash
-krepp place -i data-new/ref_index -q data-new/query_mixture.fq.gz \
-    --tabular --num-threads 4 > results/place_tab.tsv
+krepp place -i data/toy-index -q data/query_mixture.fq.gz \
+    -t data/reference_tree.nwk --num-threads 4 -o results/placements_default.jplace
 ```
-
-Output columns: `SEQ_ID`, `DISTAL_NODE`, `EDGE_NUM`, `LWR`, `DIST`
-
-```
-SEQ_ID                   DISTAL_NODE              EDGE_NUM  LWR     DIST
-tip_28108_0              Alteromonas_macleodii    12        1.0000  0.0091
-novel_54248_0            Pyrodictium_occultum     45        0.6200  0.0382
-novel_54248_0            NA                       46        0.3800  0.0599
-```
-
-Edge integers depend on your Newick; treat them as opaque IDs stable within one run.
-
-!!! danger "Internal branch = unresolved divergence"
-    `DISTAL_NODE = NA` marks mass on an **internal** branch - reads evolve from
-    an ancestor **between** named references. That is the hallmark placement when
-    the sample contains variation **not** represented on either adjacent leaf
-    (different assembly, different species, or broader novelty).
-
-Filter reads that were simulated as holdouts:
+which reports placement in a [`.jplace` file](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0031009), which is a JSON-based format used to encode phylogenetic placements as a set of records containing branch, distance, and uncertainty information per read, together with the reference tree.
 
 ```bash
-grep '^novel_' results/place_tab.tsv | head -10
+head results/placements_default.jplace
 ```
-
-Compare placement concentration on closest-reference terminals vs internal branches for
-rows whose **`novelty_level`** in `reference_info.tsv` is coarser than `species` (e.g.
-`genus`, `family`, `kingdom`).
-
-??? question "Q 5.1"
-    Sketch the subtree around `Alteromonas_macleodii` and its genus neighbors in
-    the reference tree. Where should reads from the profile genome accumulate if
-    the indexed reference is a **different species** in *Alteromonas*?
-
-??? question "Q 5.2"
-    What does LWR = 1.0 on a terminal genome id mean? What does a split LWR
-    across a terminal edge and an internal edge imply about residual divergence?
+??? question "Expected output:"
+    * Each sequence has its identifier, and a set of records pinpointing a placement.
+    * The `edge_num` indicates the branch each sequence is placed on, with weight `like_weight_ratio` reflecting the confidence.
+    * The `.jplace` file stores a decorated tree, labeling each edge of the input tree given via `-t` with `{edge_num}`.
+    ```json
+	{
+			"version" : 3,
+			"fields" : ["edge_num", "pendant_length", "distal_length", "likelihood", "like_weight_ratio", "distance"],
+			"placements" : [
+							{"n" : ["NC_015559.1-12009"], "p" : [[22, 0.02798, 0.06314, -17.19396, 1.00000, 0.08581]]},
+							{"n" : ["NC_015559.1-3949"], "p" : [[22, 0.09093, 0.06314, -17.99522, 1.00000, 0.13928]]},
+							{"n" : ["NC_022664.1-43244"], "p" : [
+									[14, 0.13809, 0.03122, -16.87034, 0.44321, 0.15156],
+									[6, 0.12885, 0.01378, -27.72109, 0.55679, 0.12989]]
+							},
+	```
+    * For more details, refer to the paper describing the format:  *"Matsen FA, Hoffman NG, Gallagher A, Stamatakis A (2012) A Format for Phylogenetic Placements. PLOS ONE 7(2): e31009. https://doi.org/10.1371/journal.pone.0031009"*.
 
 ---
 
-## Community-level placement - `--summarize`
+### Visualization and interpretation of placements
 
+You may rightfully hesitate to get your hands dirty and write your own scripts for analyzing `.jplace` files. Luckily, [`gappa`](https://github.com/lczech/gappa) (a tool we downloaded during the setup step) offers solutions for a good collection of tasks and post-processing needs, one of which is visualizing placements as a heat-tree (similar to a heat-map) from the `.jplace` outputs, coloring branches by the total placement mass they accumulate:
 ```bash
-krepp place -i data-new/ref_index -q data-new/query_mixture.fq.gz \
-    --summarize --num-threads 4 > results/place_summarize.tsv
+gappa examine heat-tree \
+    --jplace-path results/placements_default.jplace --mass-norm relative \
+    --write-svg-tree --out-dir results/ --file-prefix heat_ --allow-file-overwriting \
+    --svg-tree-shape rectangular --svg-tree-ladderize --svg-tree-stroke-width 3
 ```
 
-Output columns: `DISTAL_NODE`, `EDGE_NUM`, `WEIGHTED_COUNT`, `SEQUENCE_ABUNDANCE`
+<img src="figures/placement_heat_tree-e.png" alt="Heat-tree of placement mass across the reference phylogeny." style="display: block; margin: 1rem auto; width: 100%; max-width: 750px; height: auto;" />
 
-Internal-branch rows (`DISTAL_NODE = NA`) aggregate uncertainty between references.
-Closest references with a coarse shared `novelty_level` often deposit measurable mass there even
-when `--summarize` also peaks on the closest labeled genome.
+**Figure 5.** Heat-tree generated by the above command, showing per-branch placement mass (proportion of placements).
+Notice that a high mass has been placed within the Nitrosococcus clade, reflecting the high abundance queries *Nitrosococcus halophilus* (17.5%) and *Nitrosococcus oceani* (5.7%). Similar observations can be made for *Spiribacter roseus* and *Spiribacter salinus*. Overall, phylogenetic placements are in agreement with the input query abundances.
+<!-- Terminal branches corresponding to species-level references (e.g., *Alteromonas macleodii*, *Nitrosococcus oceani*) attract concentrated mass from their conspecific reads. -->
+<!-- Internal branches near genus-level clades (e.g., the *Nitrosococcus* subtree) collect mass from reads whose closest reference is only congeneric, reflecting the residual divergence within the genus. -->
 
-??? question "Q 5.3"
-    Why can internal edges carry placement mass even when every genome in the
-    mixture is represented **somewhere** in the reference genome set?
+**Some observations:**
+
+- **Queries with a reference from the same species** place predominantly on the terminal branch of the closest reference, with LWR near 1.0 and short placement distances (~0.002–0.02). The read is close enough to the reference genome that no other branch is competitive.
+
+- **Queries with genus-level novelty** spread their mass across multiple terminal branches within the genus clade and onto the internal branch connecting them. For example, *Nitrosococcus halophilus* reads contribute mass across *N. wardiae*, *N. oceani*, *N. watsonii*, and the internal edge joining them. krepp correctly localises the read within the genus but cannot resolve it to a single species as it is not present.
+
+- **More novel queries** tend to place either on deep internal branches or incorrectly on distant terminal branches, usually with low LWR spread across many edges.
+The placement distances are high (>0.15), and no single branch dominates.
+This correctly signals that the query diverges above the genus level and that the reference set lacks a close relative.
 
 ---
 
-## Sensitivity controls
+## Other placement options and formats
 
-| Flag | Effect |
-|------|--------|
-| `--tau 3` | Stricter cutoff - fewer noisy placements |
-| `--tau 10` | Looser - useful for very divergent novel taxa |
-| `--no-multi` | Single best placement per read only |
-| `--no-filter` | Disable distance pre-filter; include all branches |
+- For a flat and more readable view, krepp can also report placements in a table format, using `--tabular`:
+```bash
+krepp place -i data/toy-index -q data/query_mixture.fq.gz \
+    -t data/reference_tree.nwk --tabular --num-threads 4 > results/placements_tabular.tsv
+head results/placements_tabular.tsv
+```
+??? question "Expected output:"
+    * `SEQ_ID`: query sequence identifier
+    * `DISTAL_NODE`: label of the internal node under the placement branch
+    * `EDGE_NUM`: edge number in the decorated tree given in the header of the report
+    * `LWR`: likelihood weight ratio
+    * `DIST`: placement distance
+    ```
+    # software: krepp   version: v0.8.2 invocation :krepp place -i data/toy-index -q data/query_mixture.fq.gz -t data/reference_tree.nwk --tabular --num-threads 4
+    # (((Thalassolituus_oleivorans:0.04096{0},Sulfurovum_mangrovi:0.36463{1}):0.10560{2},(((Ilumatobacter_sp_AH-269-C13:0.12736{3},Ilumatobacter_coccineus:0.18559{4}):0.18819{5},(Spiribacter_roseus:0.02756{6},(Spiribacter_salinus:0.25239{7},(Candidatus_Endolissoclinum_sp:0.14462{8},(Erythrobacter_aurantius:0.14409{9},Erythrobacter_litoralis:0.07738{10}):0.06494{11}):0.10243{12}):0.03647{13}):0.06245{14}):0.15524{15},(Bacteroides_fragilis:0.50000{16},Palaeococcus_ferrophilus:0.50000{17}):0.06083{18}):0.10569{19}):0.03098{20},((Marinomonas_mediterranea:0.11388{21},(Marinomonas_posidonica:0.12629{22},((Staphylococcus_aureus:0.10455{23},(Moorella_thermoacetica:0.25831{24},Fusobacterium_nucleatum:0.14728{25}):0.07209{26}):0.12974{27},(Bacillus_subtilis:0.14246{28},(Thermus_thermophilus:0.15808{29},(Pyrodictium_occultum:0.19841{30},Mycobacterium_tuberculosis:0.20717{31}):0.04471{32}):0.02593{33}):0.12215{34}):0.07715{35}):0.04304{36}):0.09730{37},((Alteromonas_stellipolaris:0.15275{38},((Nitrosococcus_wardiae:0.08166{39},(Nitrosococcus_watsonii:0.09813{40},Nitrosococcus_oceani:-0.00904{41}):0.11275{42}):0.10015{43},(Vibrio_anguillarum:0.08961{44},(Aliivibrio_salmonicida:0.07676{45},Aliivibrio_wodanis:0.07034{46}):0.09247{47}):0.04989{48}):0.01565{49}):0.03886{50},(Alteromonas_mediterranea:0.06015{51},(Alteromonas_macleodii:0.05276{52},(Psychrobacter_cryohalolentis:0.14239{53},Allochromatium_vinosum:0.23019{54}):0.15003{55}):0.01706{56}):0.02411{57}):0.05419{58}):0.02465{59}){60};
+    SEQ_ID  DISTAL_NODE EDGE_NUM    LWR DIST
+    NC_015559.1-12009   Marinomonas_posidonica  22  1.00000 0.08581
+    NC_015559.1-3949    Marinomonas_posidonica  22  1.00000 0.13928
+    NC_022664.1-43244   Spiribacter_roseus  6   0.55679 0.12989
+    NC_022664.1-43244   NA  14  0.44321 0.15156
+    NC_011312.1-6343    Aliivibrio_salmonicida  45  1.00000 0.00009
+    NC_013960.1-152360  Nitrosococcus_wardiae   39  1.00000 0.11037
+    NZ_CP186025.1-22373 Vibrio_anguillarum  44  1.00000 0.00875
+    ```
+    * Each read may appear on multiple rows (one per placed branch), with an LWR summing to 1.0 across rows.
+    * If the distal node is not labeled, `DISTAL_NODE = NA` will be outputted even for placed reads but with a non-NA `EDGE_NUM` value.
+    * An LWR of 1.0 on a terminal node means the read maps to that reference without nay ambiguity.
+
+- To aggregate placements across all reads into per-branch abundances and report in a tabular format similar to above, we can use `--summarize` option.
+```bash
+krepp place -i data/toy-index -q data/query_mixture.fq.gz \
+    -t data/reference_tree.nwk --summarize --num-threads 4 > results/place_summarized.tsv
+```
+
+## Placing on a taxonomy
+
+- In addition to a phylogenetic tree, krepp can also place sequences on a taxonomy (which is a multi-furcating tree without branch lengths) using the same branch length agnostic algorithm.
+- For taxonomic placement, krepp requires a tab-separated lineage file (`-l`) is required to map each reference name to a semicolon-separated GTDB-style path (e.g., `REF_XYZ	k__Bacteria;p__Proteobacteria;…;s__Escherichia coli`).
+- The `-t` (tree) and `-l` (lineage) flags are mutually exclusive: use `-l` with the path to the lineage file for a taxonomy-based placement and `-t` with the path to the Newick file for phylogentic placement.
+
+??? question "Example lineage file"
+    A tab-separated file linking reference IDs to their taxonomic paths:
+    ```
+    Aliivibrio_salmonicida   k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;…
+    Vibrio_anguillarum       k__Bacteria;p__Proteobacteria;c__Gammaproteobacteria;…
+    ```
+
+```bash
+krepp place -i data/toy-index -q data/query_mixture.fq.gz \
+    -l data/lineages_refs.tsv --summarize --num-threads 4 \
+    > results/place_tax_summarize.tsv
+```
+
+The output aggregates placement mass across the taxonomy tree:
+
+```bash
+head results/place_tax_summarize.tsv
+```
+??? question "Expected output:"
+    ```
+    DISTAL_NODE              EDGE_NUM  WEIGHTED_COUNT  SEQUENCE_ABUNDANCE
+    Vibrio                   14        204.88476       0.00533
+    Alteromonas_mediterranea 29        2575.54290      0.06700
+    Alteromonas_macleodii    27        1457.59004      0.03792
+    Nitrosococcus            39        334.54889       0.00870
+    Spiribacter              44        189.23112       0.00492
+    ```
+
+- `DISTAL_NODE` is the taxonomic name (species, genus, or higher).
+- Rows at genus level and above aggregate mass from all reads mapping within that clade.

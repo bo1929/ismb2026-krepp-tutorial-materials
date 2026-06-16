@@ -5,7 +5,7 @@ This document describes how the repository is organized and what data are provid
 It does not discuss the content of the tutorial.
 
 > [!NOTE]
-> This README file is not necessarily helpful for the tutorial, feel free to not read.
+> This README file is not necessarily helpful for the tutorial, and we suggest you ignore this file.
 > Following the provided instructions and the interactive tutorial will be sufficient.
 
 ---
@@ -40,9 +40,7 @@ All lessons live under `content/` as numbered Markdown files. Order and sidebar 
 | `04-indexing.md` | Indexing | WoL index usage and building the small toy index from `input_map.tsv`. |
 | `05-distance-estimation.md` | Distance Estimation | `krepp dist` on the query mixture against an index. |
 | `06-phylogenetic-placement.md` | Phylogenetic Placement | `krepp place` on the same reads and index. |
-| `07-taxonomic-placement.md` | Taxonomic Placement | Taxonomic mapping and placement. |
-| `08-visualization.md` | Visualization | Inspecting and visualizing results. |
-| `09-conclusions.md` | Conclusions | Wrap-up and summary. |
+| `07-conclusions.md` | Conclusions | Wrap-up and summary. |
 
 Authoring conventions (admonitions, code fences, tables) are documented in `SYNTAX.md`.
 

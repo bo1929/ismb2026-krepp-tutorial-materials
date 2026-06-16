@@ -1,4 +1,4 @@
-# Distance Estimation - `krepp dist`
+# Distance Estimation: `krepp dist`
 
 - `krepp dist` computes the Hamming distance between individual sequences (e.g., short reads in our case) in a given FASTA/Q file and sufficiently similar (i.e., <25% similarity) reference genomes in the index.
 - These approximate distances are akin to alignment identity: If you were to align this read (e.g., using Bowtie2), the proportion of mismatches is expected to match krepp's distance estimates.
@@ -53,14 +53,14 @@ By default, krepp reports all reference hits, regardless of their distances.
 
 If you are only interested in references that are sufficiently close compared to the best match, use `--filter` flag:
 ```bash
-krepp dist -i data/toy-index -q data/query_mixture.fq.gz --num-threads 4 --filter -o results/distances_filtered.tsv
+krepp dist -i data/toy-index -q data/query_mixture.fq.gz --num-threads 4 \
+    --filter -o results/distances_filtered.tsv
 ```
 For each read, this only retains mappings that are not too far away from the reference hit with the minimum distance.
 
 ??? question "An example showing the impact:"
-    The total number of mappings goes down from 80,983 to 59,074 (comparing `grep -v NaN results/distances_*.tsv | wc -l`).
-
-    - `NC_022664.1-89288` has 11 hits without `--filter`, the closest one at 0.06523.
+    * The total number of mappings goes down from 80,983 to 59,074 (comparing `grep -v NaN results/distances_*.tsv | wc -l`).
+    * `NC_022664.1-89288` has 11 hits without `--filter`, the closest one at 0.06523.
     ```
     NC_022664.1-89288	Nitrosococcus_oceani	0.09644
     NC_022664.1-89288	Nitrosococcus_wardiae	0.07829
@@ -74,7 +74,7 @@ For each read, this only retains mappings that are not too far away from the ref
     NC_022664.1-89288	Marinomonas_mediterranea	0.12875
     NC_022664.1-89288	Alteromonas_macleodii	0.09642
     ```
-    - Using `--filter` reduces it to 9 mappings, keeping the ones that are statistically indistinguishable.
+    * Using `--filter` reduces it to 9 mappings, keeping the ones that are statistically indistinguishable.
     ```
     NC_022664.1-89288	Nitrosococcus_watsonii	0.07693
     NC_022664.1-89288	Alteromonas_stellipolaris	0.08504
@@ -122,10 +122,13 @@ Family and kingdom-level queries have much lower mapping rates, reflecting the a
 - With `--summarize`, krepp internally sets `--filter`. Then, for each read, it counts the number of reference hits (call it `n`), each getting an equal share (`1/n`). The reported result is an OGU table.
 
 ```bash
-krepp dist -i data/toy-index -q data/query_mixture.fq.gz --summarize --num-threads 4 > results/distances_summary.tsv
-head results/distances_summary.tsv
+krepp dist -i data/toy-index -q data/query_mixture.fq.gz --summarize --num-threads 4 \
+    > results/distances_summary.tsv && head results/distances_summary.tsv
 ```
 ??? question "Expected output:"
+    - `REFERENCE_NAME` is the genomic unit.
+    - `WEIGHTED_COUNT` denotes the total count of read contributions across the sample.
+    - `SEQUENCE_ABUNDANCE` is the normalized proportion of counts, summing up to 1.
     ```
     # software: krepp       version: v0.8.2 invocation :krepp dist -i data/toy-index -q data/query_mixture.fq.gz --summarize --num-threads 4
     REFERENCE_NAME	WEIGHTED_COUNT	SEQUENCE_ABUNDANCE
@@ -138,10 +141,6 @@ head results/distances_summary.tsv
     Pyrodictium_occultum	21.49657	0.00042
     Marinomonas_mediterranea	169.35874	0.00328
     ```
-
-    - `REFERENCE_NAME` is the genomic unit.
-    - `WEIGHTED_COUNT` denotes the total count of read contributions across the sample.
-    - `SEQUENCE_ABUNDANCE` is the normalized proportion of counts, summing up to 1.
 
 !!! danger "OGU abundances may not translate into taxonomic abundances"
     When a read comes from genome **A** and the index holds two closely related genomes **B** and **C** (e.g., three strains of the same species), the counts may be deflated. This may occur for densely sampled species (e.g., *E. coli*). In a different scenario, some references may end up having inflated counts. However, this can provide a valuable signal in downstream analysis (i.e., machine learning, prediction, or sample comparison via UniFrac).

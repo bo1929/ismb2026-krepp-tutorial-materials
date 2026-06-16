@@ -508,7 +508,7 @@ def nj_tree_newick(labels, matrix) -> str:
     tree = pdm.nj_tree()
     tree.encode_bipartitions()
     tree.reroot_at_midpoint(update_bipartitions=False)
-    # Zero out negative edge lengths — distance-based trees can produce
+    # Zero out negative edge lengths  --  distance-based trees can produce
     # artifactually negative edges; setting them to 0 is standard practice
     # and prevents branches from rendering "backwards".
     for node in tree:
@@ -823,7 +823,7 @@ def plot_reference_phylogeny(newick_path: Path, entries: list[dict]):
     # ── collect branch segments ──────────────────────────────────────────
     # Horizontal segments run at the *child's* y-level from the child back
     # toward the parent.  Vertical segments appear *only* at internal nodes
-    # to connect the y-span of their children — no staircase per edge.
+    # to connect the y-span of their children  --  no staircase per edge.
     h_segments = []
     v_segments = []
     for node in tree.preorder_node_iter():

@@ -339,7 +339,7 @@ def plot_figure(selected, krepp, mash, rates, out_path):
         ax.set_title(title, fontsize=TITLE_FS, fontweight="bold", pad=10)
         ax.tick_params(labelsize=SMALL_FS)
 
-        # Legend — query species only, italic via prop
+        # Legend  --  query species only, italic via prop
         handles = [
             plt.Line2D(
                 [0],

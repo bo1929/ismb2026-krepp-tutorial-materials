@@ -135,7 +135,7 @@ def nj_tree_newick(labels: list[str], matrix: list[list[float]]) -> str:
     tree = pdm.nj_tree()
     tree.encode_bipartitions()
     tree.reroot_at_midpoint(update_bipartitions=False)
-    # Zero out negative edge lengths — distance-based trees can produce
+    # Zero out negative edge lengths  --  distance-based trees can produce
     # artifactually negative edges; setting them to 0 is standard practice
     # and prevents branches from rendering "backwards".
     for node in tree:
