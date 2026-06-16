@@ -62,9 +62,7 @@ Notice that a high mass has been placed within the Nitrosococcus clade, reflecti
 **Some observations:**
 
 - **Queries with a reference from the same species** place predominantly on the terminal branch of the closest reference, with LWR near 1.0 and short placement distances (~0.002–0.02). The read is close enough to the reference genome that no other branch is competitive.
-
 - **Queries with genus-level novelty** spread their mass across multiple terminal branches within the genus clade and onto the internal branch connecting them. For example, *Nitrosococcus halophilus* reads contribute mass across *N. wardiae*, *N. oceani*, *N. watsonii*, and the internal edge joining them. krepp correctly localises the read within the genus but cannot resolve it to a single species as it is not present.
-
 - **More novel queries** tend to place either on deep internal branches or incorrectly on distant terminal branches, usually with low LWR spread across many edges.
 The placement distances are high (>0.15), and no single branch dominates.
 This correctly signals that the query diverges above the genus level and that the reference set lacks a close relative.

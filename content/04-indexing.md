@@ -24,7 +24,6 @@ Given a set of reference genomes, krepp builds an index via `krepp index -o /pat
 There are only two required options:
 
 * `-o` (`--index-dir`), which is the output directory path in which the index will be stored,
-
 * `-i` (`--input-file`) a two-column TSV file mapping reference IDs to paths/URLs for FASTA/Q files (gzip compatible).
 
 Each reference (whether a complete assembly or a genome skim) is a file identified by a unique ID.

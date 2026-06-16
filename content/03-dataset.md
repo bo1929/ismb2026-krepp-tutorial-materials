@@ -1,11 +1,9 @@
 # Dataset
 ## Query mixture of reads
 
-- A controlled (mock) metagenomic sample: **100,000 simulated Illumina reads** from **20 query genomes**.
-
-- The mixture is based on an abundance profile mimicking a marine environment.
-
-- Queries in this mixture differ in terms of **abundances**, **taxonomies**, and their **novelty level**.
+* A controlled (mock) metagenomic sample: **100,000 simulated Illumina reads** from **20 query genomes**.
+* The mixture is based on an abundance profile mimicking a marine environment.
+* Queries in this mixture differ in terms of **abundances**, **taxonomies**, and their **novelty level**.
 
 !!! note ""
     We will be comparing our results to the known ground truth profile given in `data/profile.tsv`!
@@ -52,10 +50,10 @@ Others share only **genus**, **family**, or **kingdom** with their best matching
     As novelty increases (species to kingdom), it becomes more difficult to identify a read and incorporate it in the analysis.
 
 ## Reference genome set
-- References cover two kingdoms (Bacteria and Archaea), five phyla (Proteobacteria, Actinobacteria, Deinococcus-Thermus, Crenarchaeota, and Euryarchaeota), and seven classes (Gammaproteobacteria, Alphaproteobacteria, Epsilonproteobacteria, Acidimicrobiia, Deinococci, Thermoprotei, and Thermococci).
-- Below we show a phylogeny consisting of both reference genomes and query genomes.
-- Novelty of each query can also be understood as the branch length to the closest reference in this phylogeny.
-- We will use a similar phylogeny after excluding the queries for phylogenetic placement of the reads in the query mixture.
+* References cover two kingdoms (Bacteria and Archaea), five phyla (Proteobacteria, Actinobacteria, Deinococcus-Thermus, Crenarchaeota, and Euryarchaeota), and seven classes (Gammaproteobacteria, Alphaproteobacteria, Epsilonproteobacteria, Acidimicrobiia, Deinococci, Thermoprotei, and Thermococci).
+* Below we show a phylogeny consisting of both reference genomes and query genomes.
+* Novelty of each query can also be understood as the branch length to the closest reference in this phylogeny.
+* We will use a similar phylogeny after excluding the queries for phylogenetic placement of the reads in the query mixture.
 
 
 <img src="figures/dataset_reference_phylogeny.png" alt="Mash neighbor-joining tree with all 31 reference genomes and all 20 query genomes as tips." style="display: block; margin: 1rem auto; width: 100%; max-width: 800px; height: auto;" />
@@ -70,11 +68,8 @@ The same species may appear at tips both as query and reference, which correspon
 ## Goals
 
 * Abundant and low-novelty query reads should be identified correctly with low distances.
-
 * High novelty reads should be mapped correctly to corresponding references but with potentially high distances.
-
 * Rare and low-abundance queries should be detected with correct abundances.
-
 * Phylogenetic placement should associate queries with correct branches, reflecting the overall composition at a higher resolution than a taxonomy.
 
 ---
